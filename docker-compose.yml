@@ -13,16 +13,13 @@ services:
             MONGO_ADMIN_PWD: ${MONGO_ADMIN_PWD}
             MONGO_HOSTNAME: ${MONGO_HOSTNAME}
         volumes:
-            - /backend/src:/usr/src/backend/src
+            - ./backend/src:/usr/src/backend/src
         ports:
             - 5000:80
         depends_on: 
             - mongodb
-        networks:
-            - frontend
-            - backend
     mongodb:
-        image: mongo:4.0.8
+        image: mongo:latest
         container_name: mongodb
         restart: unless-stopped
         command: mongod --auth
@@ -30,21 +27,17 @@ services:
             MONGO_INITDB_ROOT_USERNAME: ${MONGO_ADMIN_USER}
             MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ADMIN_PWD}
             MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
-            MONGO_DATA_DIR: /data/db
-            MONGODB_LOG_DIR: /dev/null
         ports:
-            - 27000:27000
+            - '27017-27019:27017-27019'
         volumes:
             - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-            - mongodbdata:/data/db
-        networks:
-            - backend
-networks:
-    frontend:
-        driver: bridge
-    backend:
-        driver: bridge
-volumes:
-    mongodbdata:
-        driver: local
+            - ./mongo-volume:/data/db
+#         networks:
+#             - backend
+# networks:
+#     backend:
+#         driver: bridge
+# volumes:
+#     mongodbdata:
+#         driver: local
 
