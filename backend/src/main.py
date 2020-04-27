@@ -14,7 +14,7 @@ db =mongo.db
 @app.route('/')
 def index():
     return jsonify(
-        status = True,
+        status = 200,
         message = 'Successs connect to MongoDB!'
     )
 # @app.route('/')
