@@ -1,33 +1,27 @@
 import 'package:flutter/material.dart';
-import 'MusicList.dart';
-
-String song;
-String singer;
+import 'main.dart';
 
 class MusicPlayer extends StatefulWidget {
-
-  MusicPlayer(List musicFile){
-    song = musicFile[0];
-    singer = musicFile[1];
-  }
-
   @override
   _MusicPlayerState createState() => _MusicPlayerState();
 }
 
 class _MusicPlayerState extends State<MusicPlayer> {
-  double value = 0.0;
-  int count = 1;
+  String song = Music.song;
+  String singer = Music.singer;
+  double value = 0.0; // Track current music
+  bool pause = true;
+// Button play (temporary)
   Icon icon1 = Icon(
     Icons.play_circle_filled,
     color: Colors.white,
   );
-
+// Button pause
   Icon icon2 = Icon(
     Icons.pause_circle_filled,
     color: Colors.white,
   );
-
+// Button play
   Icon icon3 = Icon(
     Icons.play_circle_filled,
     color: Colors.white,
@@ -41,6 +35,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
       body: SafeArea(
         child: Column(
           children: <Widget>[
+//--Wallpaper
             Container(
               height: 450.0,
               child: Stack(
@@ -48,12 +43,13 @@ class _MusicPlayerState extends State<MusicPlayer> {
                   Container(
                     height: 450.0,
                     decoration: BoxDecoration(
-                        gradient:
-                            LinearGradient(colors: [Colors.black, Colors.red]),
-                        image: DecorationImage(
-                          image: AssetImage('images/a.jpg'),
-                          fit: BoxFit.cover,
-                        )),
+                      gradient:
+                          LinearGradient(colors: [Colors.black, Colors.red]),
+                      image: DecorationImage(
+                        image: AssetImage('images/a.jpg'),
+                        fit: BoxFit.cover,
+                      )
+                    ),
                   ),
                   //Image Decoration for Player
                   Container(
@@ -118,6 +114,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                 color: Color(0xFF090e42),
                 child: Column(
                   children: <Widget>[
+                  //Button Sets
                     Padding(
                       padding: const EdgeInsets.fromLTRB(30.0, 0.0, 30.0, 0.0),
                       child: Slider(
@@ -133,6 +130,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
+                        // Button "Back Music"
                         IconButton(
                           iconSize: 40.0,
                           icon: Icon(
@@ -140,20 +138,22 @@ class _MusicPlayerState extends State<MusicPlayer> {
                             color: Colors.grey,
                           ),
                           onPressed: () {}),
+                        // Button "Pause/Play"
                         IconButton(
                           iconSize: 50.0,
                           icon: icon1,
                           onPressed: () {
                             setState(() {
-                              if (count % 2 == 1) {
+                              if (pause == true) {
                                 icon1 = icon2;
-                                count += 1;
+                                pause = false;
                               } else {
-                                count += 1;
                                 icon1 = icon3;
+                                pause = true;
                               }
                             });
                           }),
+                        // Button "Next Music"
                         IconButton(
                           iconSize: 40.0,
                           icon: Icon(
