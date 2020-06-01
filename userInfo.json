@@ -1,0 +1,27 @@
+{
+  "_id": "5eb3fa240ad868bc0c9e7549",
+  "email": "edgar123@gmail.com",
+  "password": "thgirwragde",
+  "phone": "0919246969",
+  "playList": [],
+  "timeLog": {},
+  "user_name": "EdgarWright"
+},
+{
+  "_id": "5eb403e361f2042d286fd174",
+  "email": "quentin123@gmail.com",
+  "name": "QuentinTarrantino",
+  "password": "feetjustfeet",
+  "phone": "0919249696",
+  "playList": [],
+  "timeLog": {}
+},
+{
+  "_id": "5eb4048961f2042d286fd175",
+  "email": "martin@gmail.com",
+  "name": "Martin Scorsese",
+  "password": "drugs",
+  "phone": "0919692469",
+  "playList": [],
+  "timeLog": {}
+},

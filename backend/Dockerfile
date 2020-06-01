@@ -1,6 +1,13 @@
+
+FROM debian:jessie
 FROM python:3.7
 RUN mkdir -p /usr/src/backend
 WORKDIR /usr/src/backend
+
+RUN apt-get -y update \
+    && apt-get install -y portaudio19-dev
+# 	libasound2 \
+# 	libasound-dev
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
