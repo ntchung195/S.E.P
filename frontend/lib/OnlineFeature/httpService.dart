@@ -84,3 +84,87 @@ createAlertDialog(String str, BuildContext context){
     );
   });
 }
+
+// ----------------------------------------------------
+// My:
+Future<bool> logOut(String name) async{
+
+  Map data = {
+    "service": "logout",
+    "username": name,
+  };
+
+  String body = json.encode(data);
+
+  final response = await http.post(url, 
+    body: body,
+  );
+
+  print("Status Code: ${response.statusCode}");
+
+  if (response.statusCode == 200){
+    return true;
+  }
+  else {
+    return false;
+  }
+
+}
+
+Future<List<String>> createPlaylist(String name, String username) async{
+
+  Map data = {
+    "service": "createPlaylist",
+    "playlistname": name,
+    "username": username,
+  };
+
+  String body = json.encode(data);
+
+  final response = await http.post(url,
+    body: body,
+  );
+
+  print("Status Code: ${response.statusCode}");
+  
+
+  if (response.statusCode == 200) {
+    print("Body Playlist: ${response.body}");
+    var jsondecode = json.decode(response.body);
+
+
+    List<dynamic> playlists = jsondecode;
+    List<String> result = playlists.cast<String>().toList();
+    return result;
+  }
+  else {
+    return null;
+  }
+
+}
+
+Future<void> playlistAdd(String name, String username, String id) async{
+
+  Map data = {
+    "service": "addPlaylist",
+    "playlistname": name,
+    "username": username,
+    "_id": id,
+  };
+
+  String body = json.encode(data);
+
+  final response = await http.post(url,
+    body: body,
+  );
+
+  print("Status Code: ${response.statusCode}");
+  print("Body: ${response.body}");
+  if (response.statusCode == 200){
+    var jsondecode = json.decode(response.body);
+  }
+  else {
+    return null;
+  }
+
+}
