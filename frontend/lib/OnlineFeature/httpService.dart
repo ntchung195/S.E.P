@@ -41,6 +41,7 @@ Future<int> createUser(String email, String name, String password) async{
   
 }
 
+
 Future<UserModel> verifyUser(String name, String password) async{
 
   Map data = {
@@ -69,24 +70,6 @@ Future<UserModel> verifyUser(String name, String password) async{
   
 }
 
-createAlertDialog(String str, BuildContext context){
-  return showDialog(context: context, builder: (context){
-    return AlertDialog(
-      title: Center(
-        child: Text(
-          str,
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.red
-          ),
-        ),
-      ),
-    );
-  });
-}
-
-// ----------------------------------------------------
-// My:
 Future<bool> logOut(String name) async{
 
   Map data = {
@@ -110,6 +93,121 @@ Future<bool> logOut(String name) async{
   }
 
 }
+
+Future<bool> transactionForCoin(String name) async{
+
+  Map data = {
+    "service": "bank",
+    "username": name,
+  };
+
+  String body = json.encode(data);
+
+  final response = await http.post(url, 
+    body: body,
+  );
+
+  print("Status Code: ${response.statusCode}");
+
+  if (response.statusCode == 200){
+    return true;
+  }
+  else {
+    return false;
+  }
+
+}
+
+Future<List<SongItem>> getfavourite() async{
+
+  //return [];
+
+  Map data = {
+    "service": "favouriteLst",
+  };
+
+  String body = json.encode(data);
+
+  final response = await http.post(url,
+    body: body,
+  );
+
+  //print("Status Code: ${response.statusCode}");
+
+  if (response.statusCode == 200){
+    Favourite favouriteList = favouriteFromJson(response.body);
+    return favouriteList.favourite;
+  }
+  else {
+    return [];
+  }
+
+}
+
+Future<Song> getSong(String id) async{
+
+  Map data = {
+    "service": "songLink",
+    "_id": id,
+  };
+
+  String body = json.encode(data);
+
+  final response = await http.post(url,
+    body: body,
+  );
+
+  print("Status Code: ${response.statusCode}");
+
+  if (response.statusCode == 200){
+    print("Body Song: ${response.body}");
+    var jsondecode = json.decode(response.body);
+    Song song = Song(
+      null, 
+      jsondecode["artist"] == null ? "Unknown" : jsondecode["artist"], 
+      jsondecode["title"] == null ? "Unknown" : jsondecode["title"], 
+      "Unknown",
+      null, 
+      jsondecode["duration"], 
+      jsondecode["link"], 
+      null
+      );
+    return song;
+  }
+  else {
+    return null;
+  }
+
+}
+
+Future<List<String>> fetchPlaylist(String username) async{
+
+  Map data = {
+    "service": "myPlaylist",
+    "username": username,
+  };
+
+  String body = json.encode(data);
+
+  final response = await http.post(url,
+    body: body,
+  );
+
+  // print("Status Code: ${response.statusCode}");
+  // print("Body: ${response.body}");
+
+  if (response.statusCode == 200) {
+    var jsondecode = json.decode(response.body);
+    List<dynamic> playlists = jsondecode["result"];
+    List<String> result = playlists.cast<String>().toList();
+    return result;
+  }
+  else {
+    return null;
+  }
+
+}
+
 
 Future<List<String>> createPlaylist(String name, String username) async{
 
@@ -167,4 +265,22 @@ Future<void> playlistAdd(String name, String username, String id) async{
     return null;
   }
 
+}
+
+
+
+createAlertDialog(String str, BuildContext context){
+  return showDialog(context: context, builder: (context){
+    return AlertDialog(
+      title: Center(
+        child: Text(
+          str,
+          style: TextStyle(
+            fontSize: 20,
+            color: Colors.red
+          ),
+        ),
+      ),
+    );
+  });
 }
