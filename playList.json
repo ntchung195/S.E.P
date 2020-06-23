@@ -1,7 +1,70 @@
-{
-  "_id": "5ebc06da4cb1023aece6c201",
-  "createdAt": "2020-05-13T17:20:10.692Z",
-  "list_name": "Potato",
-  "modifiedAt": "2020-05-13T17:20:10.692Z",
-  "song": []
-},
+[
+  {
+    "_id": {
+      "$oid": "5ef1e14d29bf993584dedeab"
+    },
+    "list_name": "PotatoAim",
+    "song": [
+      {
+        "songId": "5ef0c81fe055ef1c9be628dd",
+        "songName": "Potato"
+      },
+      {
+        "songId": "5ef0cb23e055ef1c9be628fc",
+        "songName": "Test"
+      },
+      {
+        "songId": "5ef0cb23e055ef1c9be628fd",
+        "songName": "Test1"
+      },
+      {
+        "songId": "5ef0cb23e055ef1c9be628fe",
+        "songName": "Test2"
+      }
+    ],
+    "user": {
+      "id": "5eb4048961f2042d286fd175",
+      "user_name": "Martin Scorsese"
+    },
+    "createdAt": {
+      "$date": "2020-06-23T12:08:02.872Z"
+    },
+    "modifiedAt": {
+      "$date": "2020-06-23T12:08:02.872Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "5ef1f5a75ae1ba9f4379e78d"
+    },
+    "list_name": "Tomatoes",
+    "song": [],
+    "user": {
+      "id": "Martin Scorsese",
+      "user_name": "5eb4048961f2042d286fd175"
+    },
+    "createdAt": {
+      "$date": "2020-06-23T12:29:27.339Z"
+    },
+    "modifiedAt": {
+      "$date": "2020-06-23T12:29:27.339Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "5ef1f5c46a99933c346ab971"
+    },
+    "list_name": "Tomatoes",
+    "song": [],
+    "user": {
+      "id": "Martin Scorsese",
+      "user_name": "5eb4048961f2042d286fd175"
+    },
+    "createdAt": {
+      "$date": "2020-06-23T12:29:56.915Z"
+    },
+    "modifiedAt": {
+      "$date": "2020-06-23T12:29:56.915Z"
+    }
+  }
+]
