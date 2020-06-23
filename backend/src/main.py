@@ -1,8 +1,9 @@
 import os
 import logging
 import sys
-import const
-sys.path.append('..')
+# sys.path.append('..')
+import src.const as const
+
 
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
@@ -21,12 +22,12 @@ from flask_api import status
 from src.service.config_api import ApiResponse,DetectRequest,DetectResult 
 from src.handler.add_user import add_user,add_user_info, register_user_voice
 from src.handler.auth_user import voice_recognite
+from src.handler.song_handle import get_song_path,get_song_list
+from src.handler.play_list_handle import create_play_list
 from src.service import sql
-from src import app, db
+from src import app
 
 # app = Flask(__name__)
-# app.logger.removeHandler(default_handler)
-# app.config["MONGO_URI"] = 'mongodb://' + os.environ['MONGO_ADMIN_USER'] + ':' + os.environ['MONGO_ADMIN_PWD'] + '@' + os.environ['MONGO_HOSTNAME'] + ':27017/' + os.environ['MONGO_DATABASE']
 
 # mongo = PyMongo(app)
 
@@ -39,39 +40,41 @@ def index():
         message = 'Successs connect to MongoDB!'
     )
     
-@app.route('/enroll', methods=["GET", "POST"])
+@app.route('/enroll', methods=["POST"])
 def enroll():
     log.info('Starting Process....')
     if request.method == "POST":
         json_reg = request.get_json(force=True,silent=True)
+        log.info('request info:{}'.format(request))
+        log.info('json_reg:{}'.format(json_reg))
         if not json_reg:
             return ApiResponse(message="Invalid json"), status.HTTP_400_BAD_REQUEST
         
         username = json_reg['username']
-        session['user_name'] = username
+        # session['user_name'] = username
         
 
         log.debug("User Name: {}".format(username))
 
         user_id = json_reg['user_id']
 
-        session['user_id'] = user_id
+        # session['user_id'] = user_id
         log.debug("User ID: {}".format(user_id))
         req = DetectRequest(name=username,user_id=user_id)
 
-        ok, msg = reg.validate()
+        ok, msg = req.validate()
         if not ok:
             return ApiResponse(message=msg), status.HTTP_400_BAD_REQUEST
 
         result = add_user(username,log)
-        # if not result:
-        #     return redirect(url_for('enroll'))
-        if result.code != const.CODE_DONE or result.code != const.CODE_FILE_EXIST:
+        if result.code != const.CODE_DONE :
+            if result.code == const.CODE_FILE_EXIST:                
+                return ApiResponse(success=True,code = result.code,message=result.message)
+            log.info('Get Error....')
             return ApiResponse(success=False,message=result.message),status.HTTP_400_BAD_REQUEST
+
         log.info('End Process')
-        return ApiResponse(success = True), status.HTTP_200_OK
-    else:
-        return render_template('enroll.html')
+        return ApiResponse(success = True,code = result.code)
  
 @app.route('/auth', methods =['POST', 'GET'])
 def auth():
@@ -126,7 +129,71 @@ def verify():
     if 'user_name' in session:
         user_name = session['user_name']
 
-    result = voice_recognite(user_name,user_id,log) 
+    result = voice_recognite(user_name,user_id,log)
+
+@app.route("/getSongList",methods=['GET'])
+def getSongList():
+    log.info('Starting Process....')
+    song_list = get_song_list(logging)
+    if song_list.data is None or len(song_list.data) == 0:
+        log.info('End Process....')
+        return ApiResponse(daget_song_listta=song_list.data,message=song_list.message,success=False,code=song_list.code), status.HTTP_400_BAD_REQUEST
+    else:
+        log.info('End Process....')
+        return ApiResponse(data=song_list.data,message=song_list.message,success=True,code=song_list.code)
+
+@app.route("/getSongPath",methods=['GET'])
+def getSong():
+    log.info('Starting Process....')
+    song = request.args.get('s') or request.args.get('song')
+    log.info('Error Here 3')
+
+    if song is None or len(song) == 0:
+        return ApiResponse(message='Missing Song Id'), status.HTTP_400_BAD_REQUEST
+    res = get_song_path(song,logging)
+    log.info('Respond result: {}'.format(res))
+    if res.code == const.CODE_SONG_NOT_EXIST:
+        return ApiResponse(message=res.message,code=res.code,data=''), status.HTTP_400_BAD_REQUEST
+    if res.code == const.CODE_DONE:
+        return ApiResponse(message=res.message,code=res.code,data=res.data)
+get_song_list
+@app.route("/createList",methods=['POST'])
+def getList():
+    log.info('Starting Process....')
+    json_reg = request.get_json(force=True,silent=True)
+    log.info('request info:{}'.format(request))
+    log.info('json_reg:{}'.format(json_reg))
+    if not json_reg:
+        return ApiResponse(message="Invalid json"), status.HTTP_400_BAD_REQUEST
+
+    username = json_reg['username']
+    # session['user_name'] = username
+    
+    log.debug("User Name: {}".format(username))
+
+    user_id = json_reg['user_id']
+
+    log.debug("User ID: {}".format(user_id))
+
+    list_name = json_reg['list_name']
+
+    req = DetectRequest(name=username,user_id=user_id)
+
+    ok, msg = req.validate()
+    if not ok:
+        return ApiResponse(message=msg), status.HTTP_400_BAD_REQUEST
+
+    result = create_play_list(user_id,username,list_name,log)
+
+    if result.code != const.CODE_DONE :
+        if result.code == const.CODE_PLAYLIST_NOT_EXIST:                
+            return ApiResponse(success=True,code = result.code,message=result.message),status.HTTP_404_NOT_FOUND
+        log.info('Get Error....')
+        return ApiResponse(success=False,message=result.message),status.HTTP_400_BAD_REQUEST
+
+    log.info('End Process')
+    return ApiResponse(success = True,code = result.code,message=result.message)
+
 
 
 

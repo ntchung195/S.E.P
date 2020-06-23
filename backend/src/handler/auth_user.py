@@ -11,7 +11,7 @@ from scipy.io.wavfile import read
 from src.util.voice import *
 from src.service.sql import get_user_id
 from src.service.config_api import DetectResult
-import const
+import src.const
 
 def voice_recognite(user_name,user_id,log,tag = 'recognize'):
     user_directory = const.USER_DIR +'/' + user_name

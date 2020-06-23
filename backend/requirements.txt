@@ -8,3 +8,5 @@ PyAudio==0.2.11
 scipy==1.4.1
 scikit-learn==0.19.2
 dataclasses-json
+python-speech-features==0.6
+pymongo

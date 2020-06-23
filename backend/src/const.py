@@ -16,6 +16,8 @@ CODE_ACCOUNT_NOT_EXIST = 1005
 CODE_FILE_EXIST = 1006
 CODE_PLAYLIST_NOT_EXIST = 1007
 CODE_FAIL = 1008
+CODE_SONG_NOT_EXIST = 1009
+CODE_USER_ID_NOT_VALID = 1010
 
 #voice authenication infor
 CHANNELS = 2
@@ -26,4 +28,5 @@ RECORD_SECONDS = 3
 
 
 # User Voice Folder
-USER_DIR = "../static/user_voice"
+USER_DIR = "../backend/src/static/user_voice"
+SONG_DIR = "../backend/src/static/songStorage"

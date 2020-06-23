@@ -1,6 +1,6 @@
 # import dependencies for voice biometrics
 import pyaudio
-from IPython.display import Audio, display, clear_output
+# from IPython.display import Audio, display, clear_output
 import wave
 import numpy
 from scipy.io.wavfile import read

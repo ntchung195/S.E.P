@@ -11,7 +11,7 @@ from scipy.io.wavfile import read
 from src.util.voice import *
 from src.service.sql import get_user_id
 from src.service.config_api import DetectResult
-import const
+import src.const as const
 
 def add_user(name,logging):
     
@@ -26,6 +26,7 @@ def add_user(name,logging):
     if name is None:
         return DetectResult(code=const.CODE_NAME_NOT_EXIST, message='User Name not exist')
     user_id = get_user_id(name)
+    logging.info('user_id:{}'.format(user_id))
     if user_id is None:
         return DetectResult(code=const.CODE_ACCOUNT_NOT_EXIST, message='User Id not exist')
     
