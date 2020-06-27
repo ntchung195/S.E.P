@@ -1,5 +1,6 @@
 # import dependencies for voice biometrics
 import pyaudio
+import pickle
 # from IPython.display import Audio, display, clear_output
 import wave
 import numpy
@@ -9,7 +10,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from sklearn import preprocessing
-import python_speech_features as mfcc
+from python_speech_features import mfcc
 import os
 
 
@@ -65,7 +66,7 @@ def calculate_delta(array):
                      (2 * (array[index[1][0]]-array[index[1][1]]))) / 10
     return deltas
 
-def vectorize_voice(user_directory,user_id,logging):
+def vectorize_voice(user_directory,user_id,logging,tag=None):
     if not os.path.isdir(user_directory):
         return False
     directory = os.fsencode(user_directory)
@@ -75,7 +76,7 @@ def vectorize_voice(user_directory,user_id,logging):
         filename_wav = os.fsdecode(file)
         if filename_wav.endswith(".wav"):
             logging.info("Reading audio files for processing ...")
-            (rate, signal) = scipy.io.wavfile.read(user_directory + filename_wav)
+            (rate, signal) = read(user_directory +'/'+filename_wav)
 
             extracted_features = extract_features(rate, signal)
 
@@ -91,7 +92,7 @@ def vectorize_voice(user_directory,user_id,logging):
         # GaussianMixture Model
         logging.info("Building Gaussian Mixture Model ...")
 
-        gmm = GaussianMixture(n_components=16,
+        gmm = GaussianMixture(n_components=6,
                             max_iter=200,
                             covariance_type='diag',
                             n_init=3)
@@ -99,10 +100,12 @@ def vectorize_voice(user_directory,user_id,logging):
         gmm.fit(features)
 
         logging.debug("[ * ] Modeling completed for user :{0} with data point ={1}".format(user_id,str(features.shape)))
-
+         
         logging.info("[ * ] Saving model object ...")
-
-        pickle.dump(gmm, open(user_directory+'/{}.gmm'.format(user_id), "wb"), protocol=None)
+        if tag == None:
+            pickle.dump(gmm, open(user_directory+'/{}.gmm'.format(user_id), "wb"), protocol=None)
+        if tag == "recognize":
+            pickle.dump(gmm, open(user_directory+'/{0}_{1}.gmm'.format(user_id,tag), "wb"), protocol=None)
 
         logging.info("[ * ] User has been successfully enrolled ...")
 
@@ -110,41 +113,37 @@ def vectorize_voice(user_directory,user_id,logging):
         
         return True
 
-def verify_model(filename_wav,user_directory,logging):
-
-    (rate, signal) = scipy.io.wavfile.read(filename_wav)
+def verify_model(register_gmm,regconize_wav,logging):
+    is_User = False
+    (rate, signal) = read(regconize_wav)
     extracted_features = extract_features(rate, signal)
-    gmm_models = [os.path.join(user_directory, user)
-                  for user in os.listdir(user_directory)
-                  if user.endswith('.gmm')]
+    # gmm_models = [os.path.join(user_directory, user)
+    #               for user in os.listdir(user_directory)
+    #               if user.endswith('.gmm')]
 
     # Load the Gaussian user Models
-    models = [pickle.load(open(user, 'rb')) for user in gmm_models]
+    models = pickle.load(open(register_gmm, 'rb')) 
 
-    user_list = [user.split("/")[-1].split(".gmm")[0]
-                 for user in gmm_models]
+    # user_list = [user.split("/")[-1].split(".gmm")[0]
+    #              for user in gmm_models]
 
-    log_likelihood = numpy.zeros(len(models))
+    # log_likelihood = numpy.zeros(len(models))
 
-    for i in range(len(models)):
-        gmm = models[i]  # checking with each model one by one
-        scores = numpy.array(gmm.score(extracted_features))
-        log_likelihood[i] = scores.sum()
 
-    logging.debug("Log liklihood : " + str(log_likelihood))
+    gmm = models  # checking with each model one by one
+    scores = numpy.array(gmm.score(extracted_features))
+    # log_likelihood[i] = scores.sum()
+    # scores= numpy.exp(scores) / (numpy.exp(scores)).sum()
+    logging.debug("Score respond : ",scores)
+    
+    log_likelihood = scores.sum()/100.00
+    logging.debug("Score sum respond : ",log_likelihood)
 
-    identified_user = numpy.argmax(log_likelihood)
-
-    print("[ * ] Identified User : " + str(identified_user) +
-          " - " + user_list[identified_user])
-
-    auth_message = ""
-
-    if user_list[identified_user] == username:
-        print("[ * ] You have been authenticated!")
-        auth_message = "success"
+    if log_likelihood >= -0.4:
+        is_User = True
     else:
-        print("[ * ] Sorry you have not been authenticated")
-        auth_message = "fail"
+        is_User = False
 
-    return auth_message
+ 
+
+    return is_User,log_likelihood

@@ -8,7 +8,7 @@ def get_user_id(user_name):
     Get User ID By Name
     """
     data =db.userInfo.find_one({"name":user_name})
-    if len(data) == 0:
+    if data is None:
         return
     else:
         result = data['_id']

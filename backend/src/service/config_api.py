@@ -31,7 +31,7 @@ class DetectResult:
     message: str = const.MSG_PROCESSING
     user_id: str = None
     score_auth: Optional[float] = None
-    data : Optional[str] = None
+    data : Optional[Any] = None
 
 
 @dataclass
