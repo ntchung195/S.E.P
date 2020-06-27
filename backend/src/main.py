@@ -30,7 +30,8 @@ from src import app
 # app = Flask(__name__)
 
 # mongo = PyMongo(app)
-
+user_id = ""
+username = ""
 # db =mongo.db
 
 @app.route('/')
@@ -42,6 +43,8 @@ def index():
     
 @app.route('/enroll', methods=["POST"])
 def enroll():
+    global user_id
+    global username
     log.info('Starting Process....')
     if request.method == "POST":
         json_reg = request.get_json(force=True,silent=True)
@@ -68,9 +71,11 @@ def enroll():
 
         result = add_user(username,log)
         if result.code != const.CODE_DONE :
-            if result.code == const.CODE_FILE_EXIST:                
+            if result.code == const.CODE_FILE_EXIST:             
                 return ApiResponse(success=True,code = result.code,message=result.message)
             log.info('Get Error....')
+            user_id = ""
+            username = ""
             return ApiResponse(success=False,message=result.message),status.HTTP_400_BAD_REQUEST
 
         log.info('End Process')
@@ -84,52 +89,74 @@ def auth():
 def voice():
     log.info('Starting Process....')
     if request.method == 'POST':
-        data = request.data
+        json_reg = request.get_json(force=True,silent=True)
+        data = json_reg['user_data']
         if data is None:
             return ApiResponse(message="Cannot recognize voice"),status.HTTP_400_BAD_REQUEST
-        if "user_id" in session:
-            user_id = session['user_id']
-        else:
+
+
+        user_name = json_reg["username"]
+        if len(user_name) == 0:
             return ApiResponse(message="User not register recognition voice"),status.HTTP_400_BAD_REQUEST
-        if "user_name" in session:
-            user_name = session['user_name']
-        result = add_user_info(data,user_name,user_id,log)
-        if result.code == const.CODE_SERVICE_UNAVAILABLE:
-            return ApiResponse(message=result.message),status.HTTP_503_SERVICE_UNAVAILABLE
-        if result.code == const.CODE_DONE:
-            log.info('End Process')
-            return ApiResponse(success = True,message=result.message), status.HTTP_200_OK
-
-@app.route('/biometrics', methods = ['POST', 'GET'])
-def biometrics():
-    log.info('Starting Process....')
-    if request.method == 'GET':
-        if 'user_id' in session:
-            user_id = session['user_id']
-        else:
+        user_id = json_reg["user_id"]
+        if  len(user_id) == 0:
             return ApiResponse(message="User not register recognition voice"),status.HTTP_400_BAD_REQUEST
-        if 'user_name' in session:
-            user_name = session['user_name'] 
-        log.debug("Into the biometrics route.")
-        result = register_user_voice(user_name,user_id,log)
-        if result.code == const.CODE_FAIL:
-            return ApiResponse(message=result.message),status.HTTP_400_BAD_REQUEST
-        if result.code == const.CODE_DONE:
-            return ApiResponse(message=result.message),status.HTTP_200_OK
+        tag = json_reg['tag']
+        if tag == 'register':
+            result = add_user_info(data,user_name,user_id,log)           
+            if result.code == const.CODE_SERVICE_UNAVAILABLE:
+                return ApiResponse(message=result.message),status.HTTP_503_SERVICE_UNAVAILABLE
+            respond = register_user_voice(user_name,user_id,log)
+            if respond.code == const.CODE_FAIL:
+                return ApiResponse(message=respond.message),status.HTTP_400_BAD_REQUEST
+            if respond.code == const.CODE_DONE:
+                log.info('End Process')
+                return ApiResponse(message=respond.message),status.HTTP_200_OK
+        if tag == 'recognize':
+            result = add_user_info(data,user_name,user_id,log,tag)           
+            if result.code == const.CODE_SERVICE_UNAVAILABLE:
+                return ApiResponse(message=result.message),status.HTTP_503_SERVICE_UNAVAILABLE
+            # respond = register_user_voice(user_name,user_id,log,tag)
+            # if respond.code == const.CODE_FAIL:
+            #     return ApiResponse(message=respond.message),status.HTTP_400_BAD_REQUEST
+            if result.code == const.CODE_DONE:
+                log.info('End Process')
+                return ApiResponse(message=result.message),status.HTTP_200_OK
 
 
-@app.route("/verify", methods=['GET'])
+# @app.route('/biometrics', methods = ['POST', 'GET'])
+# def biometrics():
+#     log.info('Starting Process....')
+#     if request.method == 'GET':
+#         user_id = request.args.get('user_id')
+#         log.info("user id: {}".format(user_id))       
+#         user_name = request.args.get('username')
+#         log.info("user name: {}".format(user_name))
+#         if len(user_id) == 0 and len(user_name) == 0:
+#             return ApiResponse(message="User not register recognition voice"),status.HTTP_400_BAD_REQUEST
+#         log.debug("Into the biometrics route.")
+#         result = register_user_voice(user_name,user_id,log)
+#         if result.code == const.CODE_FAIL:
+#             return ApiResponse(message=result.message),status.HTTP_400_BAD_REQUEST
+#         if result.code == const.CODE_DONE:
+#             log.info('End Process')
+#             return ApiResponse(message=result.message),status.HTTP_200_OK
+
+
+@app.route("/verify", methods=['POST'])
 def verify():
+    json_reg = request.get_json(force=True,silent=True)
     log.info('Starting Process....')
-
-    if 'user_id' in session:
-        user_id = session['user_id']
-    else:
+    user_name = json_reg["username"]
+    if len(user_name) == 0:
         return ApiResponse(message="User not register recognition voice"),status.HTTP_400_BAD_REQUEST
-    if 'user_name' in session:
-        user_name = session['user_name']
+    user_id = json_reg["user_id"]
+    if  len(user_id) == 0:
+        return ApiResponse(message="User not register recognition voice"),status.HTTP_400_BAD_REQUEST
 
     result = voice_recognite(user_name,user_id,log)
+    return ApiResponse(message=result.message,code = result.code,data=result.score_auth),status.HTTP_200_OK
+
 
 @app.route("/getSongList",methods=['GET'])
 def getSongList():
@@ -193,7 +220,4 @@ def getList():
 
     log.info('End Process')
     return ApiResponse(success = True,code = result.code,message=result.message)
-
-
-
 

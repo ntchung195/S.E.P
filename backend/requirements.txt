@@ -10,3 +10,4 @@ scikit-learn==0.19.2
 dataclasses-json
 python-speech-features==0.6
 pymongo
+Wave==0.0.2
