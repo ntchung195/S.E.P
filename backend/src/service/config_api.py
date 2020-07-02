@@ -26,6 +26,18 @@ class DetectRequest:
 
 @dataclass_json
 @dataclass
+class DetectLogin:
+    name: str
+    password: str
+    def validate(self) -> [bool,str]:
+        if not self.name:
+            return False, 'Missing user name'
+        if not self.password:
+            return False, 'Missing user password'
+        return True, ''
+        
+@dataclass_json
+@dataclass
 class DetectResult:
     code: int = const.CODE_PROCESSING
     message: str = const.MSG_PROCESSING
