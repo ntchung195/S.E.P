@@ -61,3 +61,5 @@ doc/api/
 *.js.map
 *.lock
 *.bin
+*.wav
+*.gmm

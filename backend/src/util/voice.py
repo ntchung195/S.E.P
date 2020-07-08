@@ -115,6 +115,8 @@ def vectorize_voice(user_directory,user_id,logging,tag=None):
 
 def verify_model(register_gmm,regconize_wav,logging):
     is_User = False
+    logging.info("The recognize wav dir : {}".format(regconize_wav))
+    logging.info("The gmm model dir : {}".format(register_gmm))
     (rate, signal) = read(regconize_wav)
     extracted_features = extract_features(rate, signal)
     # gmm_models = [os.path.join(user_directory, user)
@@ -134,10 +136,11 @@ def verify_model(register_gmm,regconize_wav,logging):
     scores = numpy.array(gmm.score(extracted_features))
     # log_likelihood[i] = scores.sum()
     # scores= numpy.exp(scores) / (numpy.exp(scores)).sum()
-    logging.debug("Score respond : ",scores)
+    logging.debug("Score respond : {}".format(str(scores)))
     
     log_likelihood = scores.sum()/100.00
-    logging.debug("Score sum respond : ",log_likelihood)
+    logging.debug("log_likelihood respond : {}".format(str(log_likelihood)))
+    logging.debug("Score sum respond : {}".format(str(scores.sum())))
 
     if log_likelihood >= -0.4:
         is_User = True

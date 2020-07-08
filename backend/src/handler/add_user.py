@@ -39,7 +39,7 @@ def add_user(name,logging):
         return DetectResult(code=const.CODE_DONE, message='Register Success')
     
 
-def add_user_info(data,user_name,user_id,logging,tag=None):
+def add_user_info(data,user_name,user_id,logging,count,tag=None):
     if tag == "recognize":
         filename_wav = "{0}/{1}/{2}_{3}.wav".format(const.USER_DIR,user_name,user_id,tag)
         logging.debug("User's Voice Direct: {}".format(filename_wav))
@@ -60,7 +60,7 @@ def add_user_info(data,user_name,user_id,logging,tag=None):
             return DetectResult(code=const.CODE_SERVICE_UNAVAILABLE, message=const.MSG_SERVICE_UNAVAILABLE)
         return DetectResult(code=const.CODE_DONE, message=const.MSG_REG_SUCCESS)
     if tag == None:
-        filename_wav = "{0}/{1}/{2}.wav".format(const.USER_DIR,user_name,user_id)
+        filename_wav = "{0}/{1}/{2}_{3}.wav".format(const.USER_DIR,user_name,user_id,count)
         logging.debug("User's Voice Direct: {}".format(filename_wav))
         try:
             audio = pyaudio.PyAudio()
@@ -77,24 +77,24 @@ def add_user_info(data,user_name,user_id,logging,tag=None):
             logging.error("exception: ",ex)
             logging.error(f'processing failed:',user_id)
             return DetectResult(code=const.CODE_SERVICE_UNAVAILABLE, message=const.MSG_SERVICE_UNAVAILABLE)
-        return DetectResult(code=const.CODE_DONE, message=const.MSG_REG_SUCCESS)
+        return DetectResult(code=const.CODE_RECORD_SUCCESS, message=const.MSG_REG_SUCCESS)
 
 
 def register_user_voice(user_name,user_id,logging,tag=None):
-    if tag == "recognize":
-        user_dir = const.USER_DIR +'/' + user_name
-        logging.debug(" User directory is : {}".format(user_dir))
-        res = vectorize_voice(user_dir,user_id,logging,tag)
-        if not res:
-            return DetectResult(code=const.CODE_FAIL, message=const.MSG_FAIL)
-        return DetectResult(code=const.CODE_DONE, message=const.MSG_SUCCESS)
+    # if tag == "recognize":
+    #     user_dir = const.USER_DIR +'/' + user_name
+    #     logging.debug(" User directory is : {}".format(user_dir))
+    #     res = vectorize_voice(user_dir,user_id,logging,tag)
+    #     if not res:
+    #         return DetectResult(code=const.CODE_FAIL, message=const.MSG_FAIL)
+    #     return DetectResult(code=const.CODE_DONE, message=const.MSG_SUCCESS)
     if tag == None:
         user_dir = const.USER_DIR +'/' + user_name
         logging.debug(" User directory is : {}".format(user_dir))
         res = vectorize_voice(user_dir,user_id,logging)
         if not res:
             return DetectResult(code=const.CODE_FAIL, message=const.MSG_FAIL)
-        return DetectResult(code=const.CODE_DONE, message=const.MSG_SUCCESS)
+        return DetectResult(code=const.CODE_REGSITER_VOICE_SUCCESS, message=const.MSG_SUCCESS)
         
 
 

@@ -21,5 +21,5 @@ def voice_recognite(user_name,user_id,logging,tag = 'recognize'):
 
     res,score = verify_model(register_gmm,regconize_wav,logging)
     if not res:
-        return DetectResult(code=const.CODE_FAIL,score_auth = 1 + score, message="cannot recognize user, recognize again!")
-    return DetectResult(code=const.CODE_DONE,score_auth = 1 + score, message="recognize success")
+        return DetectResult(code=const.CODE_FAIL,score_auth = 1 + score,data = res, message="cannot recognize user, recognize again!")
+    return DetectResult(code=const.CODE_DONE,score_auth = 1 + score,data = res, message="recognize success")
