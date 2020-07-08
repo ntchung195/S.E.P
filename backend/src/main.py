@@ -3,7 +3,9 @@ import logging
 import sys
 # sys.path.append('..')
 import src.const as const
-
+import src.handler.info_handler.auth as auth, src.handler.info_handler.purchase as purchase, src.handler.info_handler.bank as bank, src.handler.info_handler.update as update
+from src.handler.song_handler import listsong, playlist
+from src.handler.info_handler import auth, bank, purchase, update
 
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
@@ -25,7 +27,7 @@ from src.handler.auth_user import voice_recognite
 from src.handler.song_handle import get_song_path,get_song_list
 from src.handler.play_list_handle import create_play_list
 from src.service import sql
-from src import app
+from src import app, db
 
 # app = Flask(__name__)
 
@@ -34,12 +36,12 @@ user_id = ""
 username = ""
 # db =mongo.db
 
-@app.route('/')
-def index():
-    return jsonify(
-        status = 200,
-        message = 'Successs connect to MongoDB!'
-    )
+# @app.route('/')
+# def index():
+#     return jsonify(
+#         status = 200,
+#         message = 'Successs connect to MongoDB!'
+#     )
     
 @app.route('/enroll', methods=["POST"])
 def enroll():
@@ -81,10 +83,142 @@ def enroll():
         log.info('End Process')
         return ApiResponse(success = True,code = result.code)
  
-@app.route('/auth', methods =['POST', 'GET'])
-def auth():
-    pass
 
+@app.route("/", methods = ['POST','GET'])
+def homepage(): 
+    log.info('Starting Process....')
+    if request.method == 'POST':
+        result = request.get_json(force=True, silent = True)
+        log.info('request info:{}'.format(request))
+        log.info('json_reg:{}'.format(result))
+        if not result:
+            return ApiResponse(message="Invalid json"), status.HTTP_400_BAD_REQUEST
+        service = result["service"]
+
+        if service == 'login':
+            password = result['password']
+            log.debug("Password: {}".format(password))
+
+            username = result['username']
+            log.debug("User Name: {}".format(username))
+
+            req = DetectLogin(name =username, password = password)
+            ok, msg = req.validate()
+            if not ok:
+                return ApiResponse(message=msg), status.HTTP_400_BAD_REQUEST    
+
+            # ok then go
+            login_res = auth.login(result, db)
+            print(login_res.message)
+            if login_res.code == const.CODE_SERVICE_UNAVAILABLE:
+                return ApiResponse(code = login_res.code, message=login_res.message),status.HTTP_503_SERVICE_UNAVAILABLE
+            if login_res.code != const.CODE_DONE:
+                return ApiResponse(code = login_res.code, message=login_res.message),status.HTTP_400_BAD_REQUEST   
+            if login_res.code == const.CODE_DONE:
+                return ApiResponse(success = True,code = login_res.code, message=login_res.message, data = login_res.data),status.HTTP_200_OK
+
+        elif service == 'signup':
+            password = result['password']
+            log.debug("Password: {}".format(password))
+
+            username = result['username']
+            log.debug("User Name: {}".format(username))
+
+            req = DetectLogin(name =username, password = password)
+            ok, msg = req.validate()
+            if not ok:
+                return ApiResponse(message=msg), status.HTTP_400_BAD_REQUEST 
+
+            register_res = auth.register(result, db)
+            print(register_res.message)
+
+            if register_res.code == const.CODE_SERVICE_UNAVAILABLE:
+                return ApiResponse(code = register_res.code, message=register_res.message),status.HTTP_503_SERVICE_UNAVAILABLE
+            if register_res.code != const.CODE_DONE:
+                return ApiResponse(code = register_res.code, message=register_res.message),status.HTTP_400_BAD_REQUEST   
+            if register_res.code == const.CODE_DONE:
+                return ApiResponse(success = True,code = register_res.code, message=register_res.message),status.HTTP_200_OK
+        
+        elif service == 'purchase':
+            password = result['password']
+            log.debug("Password: {}".format(password))
+
+            username = result['username']
+            log.debug("User Name: {}".format(username))
+
+            coin = result['coin']
+            log.debug("Coin: {}".format(coin))
+
+            req = DetectLogin(name =username, password = password)
+            ok, msg = req.validate()
+            if not ok:
+                return ApiResponse(message=msg), status.HTTP_400_BAD_REQUEST 
+
+            purchase_res = purchase.purchase(result, db) 
+            if purchase_res.code == const.CODE_SERVICE_UNAVAILABLE:
+                return ApiResponse(code = purchase_res.code, message=purchase_res.message),status.HTTP_503_SERVICE_UNAVAILABLE
+            if purchase_res.code != const.CODE_DONE:
+                return ApiResponse(code = purchase_res.code, message=purchase_res.message),status.HTTP_400_BAD_REQUEST   
+            if purchase_res.code == const.CODE_DONE:
+                return ApiResponse(success = True,code = purchase_res.code, message=purchase_res.message, data = purchase_res.data),status.HTTP_200_OK
+        
+        if service == 'logout':
+            username = result['username']
+            log.debug("User Name: {}".format(username))
+
+            if username is None:
+                return ApiResponse(message=msg), status.HTTP_400_BAD_REQUEST 
+
+            logout_res = auth.logout(result, db)
+            if logout_res.code == const.CODE_SERVICE_UNAVAILABLE:
+                return ApiResponse(code = logout_res.code, message=logout_res.message),status.HTTP_503_SERVICE_UNAVAILABLE 
+            if logout_res.code == const.CODE_DONE:
+                return ApiResponse(success = True, code = logout_res.code, message=logout_res.message),status.HTTP_200_OK
+    return 'Welcome'
+
+@app.route("/bank", methods = ['POST', 'GET'])
+def autobank():
+    if request.method=='POST':
+        result = request.get_json(force=True)
+        return bank.trans(result, db)
+    return 'Welcome to your bank'
+
+@app.route("/update", methods = ['POST', 'GET'])
+def upday():
+    if request.method=='POST':
+        result = request.get_json(force=True)
+        service = result["service"]
+        if service == "updatePhone":
+            return update.update_phone(result, db)
+        if service == "updateEmail":
+            return update.update_email(result, db)
+    return "Phone ?"
+
+@app.route('/song', methods = ['POST','GET'])
+def home():
+    playlist_coll=db.song
+    play = db.playList
+    #test.update({'username':'Obito','playlistName':'Feels Good'},{'$push':{'songName':'Trung doc'}})
+    if request.method =='POST':
+        result = request.get_json(force = True)
+        type = result["service"]
+        if type == 'favouriteLst':
+            return playlist.song(result,db)
+        if type == 'songLink':
+            return playlist.play(result,db)
+        if type == 'createPlaylist':
+            return listsong.createPlayList(result,db)
+        if type == 'myPlaylist':
+            return listsong.myPlaylist(result ,db)
+        if type == 'addSong':
+            return listsong.addSong(result,db)
+        if type == 'deleteSong':
+            return listsong.deleteSong(result,db)
+        if type == 'fetchPlaylist':
+            return listsong.fetchPlaylisy(result,db)
+            
+    return 'OK'
+    
 @app.route('/voice', methods = ['POST', 'GET'])
 def voice():
     log.info('Starting Process....')
