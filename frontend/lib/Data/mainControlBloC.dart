@@ -1,6 +1,4 @@
 import 'dart:math';
-// import 'package:MusicApp/OnlineFeature/httpTest.dart';
-import 'package:MusicApp/Data/playlistModel.dart';
 import 'package:MusicApp/Data/songModel.dart';
 import 'package:MusicApp/OnlineFeature/httpService.dart';
 import 'package:flute_music_player/flute_music_player.dart';
@@ -14,10 +12,11 @@ enum PlayerMode { shuffle, repeat, normal }
 class MainControllerBloC{
 
   InfoControllerBloC infoBloC;
+  BehaviorSubject<List<Song>> songfromDB;
 
 //List
   
-  BehaviorSubject<List<SongItem>> favourite;
+  BehaviorSubject<List<Song>> favourite;
 
 //List management
   BehaviorSubject<bool> isUsed;
@@ -36,10 +35,12 @@ class MainControllerBloC{
   BehaviorSubject<Duration> _position;
 
   BehaviorSubject<PlayerState> _playerState;
-  BehaviorSubject<PlayerMode> _playerMode; 
+  BehaviorSubject<PlayerMode> _playerMode;
 
   BehaviorSubject<Song> _currentSong;
-
+  BehaviorSubject<MapEntry<List<Song>, List<Song>>> _currPlaylist;
+  BehaviorSubject<MapEntry<List<SongItem>, List<SongItem>>> _currPlaylistOnline;
+  
   BehaviorSubject<List<Song>> get songList => _songs;
   BehaviorSubject<Song> get currentSong => _currentSong;
 
@@ -63,33 +64,42 @@ class MainControllerBloC{
   }
 
   void dispose(){
+    isDispose = true;
     isUsed.close();
     fromDB.close();
-    isDispose = true;
+  //Common stream
+    _currPlaylist.close();
+    _currPlaylistOnline.close();
     _audioPlayer.stop();
-    playerState.close();
-    playerMode.close();
-    position.close();
-    songList.close();
-    currentSong.close();
+    _position.close();
     _songs.close();
-    favourite.close();
+    _currentSong.close();
     _playerState.close();
     _playerMode.close();
-    _position.close();
-    _currentSong.close();
+
+  //Online stream
+    favourite.close();
+    songfromDB.close();
   }
 
   void _initStreams(){
+    
     isUsed = BehaviorSubject<bool>.seeded(false);
     fromDB = BehaviorSubject<bool>.seeded(false);
+    
+    _currPlaylist = BehaviorSubject<MapEntry<List<Song>, List<Song>>>();
+    _currPlaylistOnline = BehaviorSubject<MapEntry<List<SongItem>, List<SongItem>>>();
     _songs = BehaviorSubject<List<Song>>();
-    favourite = BehaviorSubject<List<SongItem>>();
-    //_albums = List<Album>();
+    
+
     _position = BehaviorSubject<Duration>();
-    //_favorites = [];
+
     _playerState = BehaviorSubject<PlayerState>.seeded(PlayerState.stopped);
     _playerMode = BehaviorSubject<PlayerMode>.seeded(PlayerMode.normal);
+
+    songfromDB = BehaviorSubject<List<Song>>();
+    favourite = BehaviorSubject<List<Song>>();
+
   }
 
   void _initCurrentSong() {
@@ -98,6 +108,7 @@ class MainControllerBloC{
       " ",
       " ",
       " ",
+      null,
       null,
       null,
       null,
@@ -135,13 +146,10 @@ class MainControllerBloC{
   }
 
   Future<void> fetchFavourite() async {
-    List<SongItem> fav = await getfavourite();
-    print(fav);
-    favourite.add(fav);
+    List<Song> _favourite = await getfavourite();
+    print(_favourite);
+    favourite.add(_favourite);
   }
-
-
-
 
   Future<void> fetchSongs() async {
     print("Fectch Songs");
@@ -150,6 +158,26 @@ class MainControllerBloC{
         (songs) => _songs.add(songs)
       );
   }
+
+  void updatePlaylist(List<Song> normalPlaylist) {
+    int count = 0;
+    List<String> _print = [];
+    while (count < 6){
+      _print = _print + [normalPlaylist[count].title];
+      count++;
+    }
+    print("Songs : $_print");
+
+    List<Song> _shufflePlaylist = []..addAll(normalPlaylist);
+    _shufflePlaylist.shuffle();
+    _currPlaylist.add(MapEntry(normalPlaylist, _shufflePlaylist));
+  }
+
+  // void updatePlaylistOnline(List<SongItem> normalPlaylist) {
+  //   List<SongItem> _shufflePlaylist = []..addAll(normalPlaylist);
+  //   _shufflePlaylist.shuffle();
+  //   _currPlaylistOnline.add(MapEntry(normalPlaylist, _shufflePlaylist));
+  // }
 
   void playMode(int mode){
     if (mode == 0)
@@ -175,9 +203,18 @@ class MainControllerBloC{
   }
 
 //Basic Function
-  play(Song song, {Playlist playlist}) {
-    _currentSong.add(song);
-    _audioPlayer.play(song.uri, isLocal: false);
+  playSong(Song song) async{
+    Song songPlay = song;
+    if (song.uri == null) {
+      Song songDB = await getSong(song.iD);
+      if (songDB == null) {
+        print("Cant load song");
+        return;
+      }
+      songPlay = songDB;
+    }
+    _currentSong.add(songPlay);
+    _audioPlayer.play(songPlay.uri, isLocal: false);
     _playerState.add(PlayerState.playing);
   }
 
@@ -196,26 +233,67 @@ class MainControllerBloC{
 
   Future<void> next() async {
     stop();
-    List<Song> songs = _songs.value;
-    int index = songs.indexOf(_currentSong.value);
-    //print(index);
-    if (index == -1) index = 0;
-    if (index + 1 == songs.length)
-      _currentSong.add(songs[0]);
+
+    final List<Song> _playlist = isShuffle ? _currPlaylist.value.value : _currPlaylist.value.key;
+    
+    int index = 0;
+    if (fromDB.value == true) {
+      while (index < _playlist.length){
+        if (_currentSong.value.title == _playlist[index].title && _currentSong.value.artist == _playlist[index].artist){
+          break;
+        }
+        index++;
+      }
+    }
     else
-      _currentSong.add(songs[index + 1]);
-    play(songs[index + 1]);
+      index = _playlist.indexOf(_currentSong.value);
+    //print("Index: $index");
+
+    if (index == -1) index = 0; //Song not in current playlist
+    
+    if (index + 1 == _playlist.length)
+      index = 0;
+    else
+      index += 1;
+
+    //print("Shuffle: ${_currPlaylist.value.value}");
+
+    // int count = 0;
+    // List<String> _print = [];
+    // while (count < 6){
+    //   _print = _print + [_playlist[count].title];
+    //   count++;
+    // }
+
+    // print(_print);
+
+    print(_playlist[index].title);
+    playSong(_playlist[index]);
   }
 
   Future prev() async {
     stop();
-    List<Song> songs = _songs.value;
-    int index = songs.indexOf(_currentSong.value);
-    if (index - 1 == -1)
-      _currentSong.add(songs[songs.length - 1]);
+
+    final List<Song> _playlist =
+            isShuffle ? _currPlaylist.value.value : _currPlaylist.value.key;
+    
+    int index = 0;
+    if (fromDB.value == true) {
+      while (index < _playlist.length){
+        if (_currentSong.value.title == _playlist[index].title && _currentSong.value.artist == _playlist[index].artist){
+          break;
+        }
+        index++;
+      }
+    }
     else
-      _currentSong.add(songs[index - 1]);
-    play(_currentSong.value);
+      index = _playlist.indexOf(_currentSong.value);
+    if (index == 0)
+      index = _playlist.length - 1;
+    else
+      index -= 1;
+
+    playSong(_playlist[index]);
   }
 
   void playRandomSong(){
@@ -224,17 +302,13 @@ class MainControllerBloC{
     int nextIndex = r.nextInt(songs.length);
     while (_currentSong.value == songs[nextIndex])
       nextIndex = r.nextInt(songs.length);
-    _currentSong.add(songs[nextIndex]);
-    play(_currentSong.value);
+    playSong(songs[nextIndex]);
   }
 
   void onComplete() {
     stop();
     if (isRepeat)
-      play(_currentSong.value);
-    else if (isShuffle) {
-      playRandomSong();   
-    }
+      playSong(_currentSong.value);
     else
       next();
   }

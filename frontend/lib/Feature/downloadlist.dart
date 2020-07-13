@@ -1,12 +1,10 @@
 import 'package:MusicApp/Custom/color.dart';
 import 'package:MusicApp/Custom/customIcons.dart';
 import 'package:MusicApp/Data/mainControlBloC.dart';
-import 'package:MusicApp/Data/userModel.dart';
 import 'package:MusicApp/Feature/currentPlaying.dart';
 import 'package:MusicApp/Feature/musicPlayer.dart';
 import 'package:MusicApp/OnlineFeature/UI/userProfile.dart';
 import 'package:MusicApp/Custom/sizeConfig.dart';
-import 'package:MusicApp/OnlineFeature/httpService.dart';
 import 'package:flute_music_player/flute_music_player.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -91,10 +89,9 @@ class _DownloadlistState extends State<Downloadlist> {
       ),
       onPressed: () async {
         
-        UserModel userInfo = mp.infoBloC.userInfo.value;
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => UserProfile(userInfo))
+          MaterialPageRoute(builder: (context) => UserProfile(mp))
         );
       }
     );
@@ -133,7 +130,13 @@ class _DownloadlistState extends State<Downloadlist> {
       buttonColor: ColorCustom.orange,
       child: RaisedButton(
         onPressed: ((){
+          setState(() {
+            isUsed = true;
+          });
           mp.stop();
+          mp.isUsed.add(true);
+          mp.fromDB.add(false);
+          mp.updatePlaylist(mp.songList.value);
           mp.playRandomSong();
         }),
         shape: RoundedRectangleBorder(
@@ -264,7 +267,7 @@ class _DownloadlistState extends State<Downloadlist> {
               if (index == _filterList.length) 
                 return widget._isOnline ? Container(height: 60) : Container();
               Song _song = _filterList[index];
-              return songTile(mp, _song);
+              return songTile(mp, _song, _songList);
               },                                     
             ),
         );
@@ -292,22 +295,27 @@ class _DownloadlistState extends State<Downloadlist> {
     );
   }
 
-  Widget musicArt(Song song){
-    return Container(
-      height: 50,
-      width: 50,
-      child: Image(
-        fit: BoxFit.fill,
-        image: AssetImage(
-          song.albumArt,
-        )
-      ),
-    );
+  Widget musicArt(Song song) {
+    return musicIcon();
+    // try {
+    //   Widget icon = Container(
+    //     height: 50,
+    //     width: 50,
+    //     child: FadeInImage(
+    //       fit: BoxFit.fill,
+    //       placeholder: AssetImage(song.albumArt), 
+    //       image: AssetImage(song.albumArt),
+    //     )
+    //   );
+    //   return icon;
+    // } catch(e) {
+    //   return musicIcon();
+    // }
   }
 
-  Widget songTile(MainControllerBloC mp, Song song){
+  Widget songTile(MainControllerBloC mp, Song song, List<Song> songList){
     return ListTile(
-      leading: musicIcon(),
+      leading: song.albumArt == null ? musicIcon() : musicArt(song),
       title: Text(
         song.title,
         overflow: TextOverflow.ellipsis,
@@ -328,62 +336,21 @@ class _DownloadlistState extends State<Downloadlist> {
           fontWeight: FontWeight.w400,
         ),
       ),
-      trailing: moreSetting(),
+      //trailing: moreSetting(),
       onTap: () {                                                         //Function for song cards
         setState(() {
           isUsed = true;
         });
         mp.isUsed.add(true);
         mp.fromDB.add(false);
+        mp.updatePlaylist(songList);
         mp.stop();
-        mp.play(song);
+        mp.playSong(song);
       },
     );
   }
 
-  Widget moreSetting(){
-    return PopupMenuButton<int>(
-      color: ColorCustom.grey,
-      icon: Icon(
-        Icons.more_vert,
-        color: Colors.white,
-        size: 30.0,
-      ),
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-        const PopupMenuItem<int>(
-          value: 1,
-          child: Text(
-            "Upload",
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'Lato',
-              fontWeight: FontWeight.w700,
-              fontSize: 18,
-            ),
-          ),
-        ),
-        const PopupMenuItem<int>(
-          value: 2,
-          child: Text(
-            "Add to playlist",
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'Lato',
-              fontWeight: FontWeight.w700,
-              fontSize: 18,
-            )
-          ),
-        )
-      ],
-//Function for Upload and Add to playlist
-      onSelected: (val){
-        if (val == 1)
-          print("Upload");
-        else print("Add to playlist");
-      },
-//-----------------------------------------------------------
-    );
-  }
+
 
 
 }
