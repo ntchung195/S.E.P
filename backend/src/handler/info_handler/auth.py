@@ -64,3 +64,28 @@ def logout(result, db):
         return DetectResult(code=const.CODE_SERVICE_UNAVAILABLE, message='Service not available')
     
     return DetectResult(code=const.CODE_DONE, message='USER LOGGED OUT')
+
+def userInfo(username,db):
+    exist_user = get_user_info(username)
+
+    if exist_user is None:
+        return DetectResult(code=const.CODE_NAME_NOT_EXIST, message='User is not Exist')
+
+    if exist_user['isLog'] == 1:
+        return DetectResult(code=const.CODE_ACCOUNT_LOGGED, message='User already logged in')
+
+    login_check = update_user_login(username)
+    print(login_check)
+    if login_check == False:
+        return DetectResult(code=const.CODE_SERVICE_UNAVAILABLE, message='Service not available')
+
+    coinn = get_user_coin(username)
+    if coinn is None:
+        return DetectResult(code=const.CODE_COIN_NULL, message='User has no coin')
+    print(coinn)
+
+    email = exist_user['email']
+    phone = exist_user['phone']
+    status = exist_user['status']
+
+    return DetectResult(code=const.CODE_DONE,data = exist_user, message='USER LOGGED IN')

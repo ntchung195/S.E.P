@@ -21,7 +21,7 @@ from flask_api import status
 # from flask.logging import default_handler
 # from flask_pymongo import PyMongo
 
-from src.service.config_api import ApiResponse,DetectRequest,DetectResult 
+from src.service.config_api import ApiResponse,DetectRequest,DetectResult,DetectLogin 
 from src.handler.add_user import add_user,add_user_info, register_user_voice
 from src.handler.auth_user import voice_recognite
 from src.handler.song_handle import get_song_path,get_song_list
@@ -302,7 +302,7 @@ def getSong():
         return ApiResponse(message=res.message,code=res.code,data=''), status.HTTP_400_BAD_REQUEST
     if res.code == const.CODE_DONE:
         return ApiResponse(message=res.message,code=res.code,data=res.data)
-get_song_list
+
 @app.route("/createList",methods=['POST'])
 def getList():
     log.info('Starting Process....')
@@ -340,3 +340,20 @@ def getList():
     log.info('End Process')
     return ApiResponse(success = True,code = result.code,message=result.message)
 
+@app.route("/getUserInfo",methods=['POST'])
+def getUserInfo():
+    log.info('Starting Process....')
+    json_reg = request.get_json(force=True,silent=True)
+    username = json_reg['username']
+    if username is None:
+        return ApiResponse(message="Cannot get user Info"),status.HTTP_400_BAD_REQUEST
+    log.debug("User Name: {}".format(username))
+    # ok then go
+    login_res = auth.userInfo(username, db)
+    print(login_res.message)
+    if login_res.code == const.CODE_SERVICE_UNAVAILABLE:
+        return ApiResponse(code = login_res.code, message=login_res.message),status.HTTP_503_SERVICE_UNAVAILABLE
+    if login_res.code != const.CODE_DONE:
+        return ApiResponse(code = login_res.code, message=login_res.message),status.HTTP_400_BAD_REQUEST   
+    if login_res.code == const.CODE_DONE:
+        return ApiResponse(success = True,code = login_res.code, message=login_res.message, data = login_res.data),status.HTTP_200_OK    

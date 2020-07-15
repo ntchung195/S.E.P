@@ -144,7 +144,7 @@ def get_list():
     data = db.songInfo.find({})
     res = []
     for document in data:
-        res.append({"id": str(document['_id']),"name":str(document['songName'])})
+        res.append({"_id": str(document['_id']),"title":str(document['songName']),"artist":str(document['artist'])})
         print(document)
     
     return res
