@@ -10,7 +10,7 @@ import 'package:MusicApp/Custom/color.dart';
 // import 'package:MusicApp/Custom/customIcons.dart';
 // import 'package:provider/provider.dart';
 import 'package:MusicApp/OnlineFeature/UI/purchase.dart';
-import 'package:MusicApp/Custom/custemText.dart';
+import 'package:MusicApp/Custom/customText.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -20,7 +20,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
 
   FocusNode focusNode = FocusNode();
-  String hintText = 'Songs, albums, artists';
+  String hintText = 'Songs, albums, artists...';
 
   String _searchKey = "";
   
@@ -32,7 +32,7 @@ class _SearchPageState extends State<SearchPage> {
         if (focusNode.hasFocus) {
           hintText = '';
         } else {
-          hintText = 'Songs, albums, artists';
+          hintText = 'Songs, albums, artists...';
         }       
       });
     });
@@ -43,8 +43,14 @@ class _SearchPageState extends State<SearchPage> {
     SizeConfig().init(context);
     return SafeArea(
         child: Scaffold(
-        backgroundColor: Colors.black,
-        body: body(),
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            title: searchBar(),
+          ),
+          backgroundColor: Colors.black,
+          body: body(),
       ),
     );
   }
@@ -77,14 +83,14 @@ class _SearchPageState extends State<SearchPage> {
             SizedBox(width: 50),
             buttonWidget(Icons.shopping_cart, "VIP",
               function: (){
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return Dialog(
-                      child: Purchase(),
-                    );
-                  }
-                );
+                // showDialog(
+                //   context: context,
+                //   builder: (context) {
+                //     return Dialog(
+                //       child: Purchase(),
+                //     );
+                //   }
+                // );
               }
             ),
           ],
@@ -121,17 +127,9 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 40,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                TextLato("Search", Colors.white, 36, FontWeight.w500),
-              ],
-            ),
-            SizedBox(height: 20,),
-            searchBar(),
-            allTagColumn(),
-            //emptySearch()
+            SizedBox(height: 10,),
+            //allTagColumn(),
+            emptySearch(),
             !isUsed ? Container(height: 75) : Container(height: 150),
           ],
         ),
@@ -141,11 +139,16 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget searchBar(){
     return Container(
+      constraints: BoxConstraints(
+       maxHeight: 70,
+       maxWidth: 350 
+      ),
       padding: EdgeInsets.only(left: 18),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
-        color: Colors.black,
+          width: 3,
+          color: ColorCustom.orange,
         ),
         borderRadius: BorderRadius.all(Radius.circular(20))
       ),
@@ -164,18 +167,17 @@ class _SearchPageState extends State<SearchPage> {
           Expanded(
             child: TextField(
               focusNode: focusNode,
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.start,
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 18),
 //Hint text for textfield
               decoration: InputDecoration(
-                
                 hintText: hintText,
                 hintStyle: TextStyle(
-                  color: Colors.black,
+                  color: ColorCustom.grey,
                   fontFamily: 'Lato',
-                  fontWeight: FontWeight.w100,
+                  fontWeight: FontWeight.w300,
                   fontSize: 18,
                   letterSpacing: 0,
                 ),
@@ -202,7 +204,7 @@ class _SearchPageState extends State<SearchPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SizedBox(height: 16,),
+        SizedBox(height: 10,),
         TextLato("Top Gernes", Colors.white, 20, FontWeight.w400),
         SizedBox(height: 15,),
         

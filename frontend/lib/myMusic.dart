@@ -37,7 +37,7 @@ class GoOnline extends StatelessWidget {
       create: (BuildContext context){
         mpBloC.fetchSongs();
         //mpBloC.fetchFavourite();
-        //mpBloC.infoBloC.saveUserInfo(userInfo);
+        mpBloC.infoBloC.saveUserInfo(userInfo);
         return mpBloC;
       },
       dispose: (BuildContext context, MainControllerBloC mp) => mp.dispose(),

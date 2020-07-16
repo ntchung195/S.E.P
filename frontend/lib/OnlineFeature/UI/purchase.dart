@@ -3,48 +3,18 @@ import 'package:MusicApp/Custom/sizeConfig.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:MusicApp/Custom/color.dart';
+import 'package:MusicApp/OnlineFeature/httpService.dart';
+
+import 'package:MusicApp/Data/infoControllerBloC.dart';
 
 class Purchase extends StatelessWidget {
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   SizeConfig().init(context);
-  //   return Scaffold(
-  //       appBar: appBar(context),
-  //       backgroundColor: Colors.black,
-  //       body: Column(
-  //         children: <Widget>[
-  //           SizedBox(height: 50/640*SizeConfig.screenHeight,),
-  //         Expanded(
-  //           child: Container(
-  //             padding: EdgeInsets.only(left: 38, right: 38),
-  //             child: paymentMethod(context),
-  //         ),
-  //         )],
-  //       )
-  //   );
-  // }
+  final InfoControllerBloC userBloC;
+  final String type;
+  final BuildContext parentContext;
 
-  // Widget appBar(BuildContext context) {
-  //   return AppBar(
-  //     backgroundColor: Colors.black,
-  //     centerTitle: true,
-  //     leading: BackButton(
-  //         onPressed: () {
-  //           Navigator.pop(context);
-  //         }
-  //     ),
-  //     title: text("PAYMENT METHOD"),
-  //     actions: <Widget>[
-  //       IconButton(
-  //         onPressed: () {},
-  //         icon: Icon(
-  //             IconCustom.settings_1
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+  Purchase({@required this.userBloC, this.type, this.parentContext});
+
 
   @override
   Widget build(BuildContext context) {
@@ -101,21 +71,19 @@ class Purchase extends StatelessWidget {
   Widget bankInfo(Image image, String bankName, BuildContext context) {
     return Container(
       height: 75,
-      // decoration: BoxDecoration(
-      //   border: Border.all(color: Colors.white),
-      // ),
       child: ListTile(
         contentPadding: EdgeInsets.only(left: 0,),
         leading: image,
         title: text(bankName, color: Colors.amber),
         onTap: (){
-          createAlert(context, bankName).then((onValue) => print(onValue)); // send to database
+          createAlert(context, bankName); // send to database
         },
       ),
     );
   }
 
   final TextEditingController customController = TextEditingController();
+  final TextEditingController coinController = TextEditingController();
 
   Future<String> createAlert(BuildContext context, String bankName){
     return showDialog(
@@ -151,8 +119,27 @@ class Purchase extends StatelessWidget {
             MaterialButton(
               elevation: 5.0,
                 child: text('Confirm buy',size: 20 ,color: Colors.amber),
-              onPressed: (){
-                Navigator.of(context).pop(customController.text.toString());
+              onPressed: () async{
+                if (type == "status"){
+                  // if (customController.text.toString().contains(RegExp(r'[A-Z]')))
+                  // int _coin = int.parse(customController.text.toString());
+                  // print(int.parse(customController.text.toString()));
+
+                  int result = await buyVipAndSong(userBloC,customController.text.toString() ,type, 100000);
+                  if (result == 0){
+                    customController.text = "";
+                    int count = 0;
+                    Navigator.of(context).popUntil((_) => count++ >= 2);
+                  }
+                  else if (result == 1) createAlertDialog("Not enough coin!", context);
+                  else if (result == 2) createAlertDialog("Wrong password", context);
+                  else createAlertDialog("There is problems", context);
+
+                }
+                else if (type == "buycoin"){
+                  popUpCoin(context);
+                }
+
               },
             )
           ],
@@ -160,5 +147,62 @@ class Purchase extends StatelessWidget {
       }
     );
   }
+
+  Future<String> popUpCoin(BuildContext context){
+    return showDialog(
+      context: context, 
+      builder: (context){
+        return AlertDialog(
+          backgroundColor: ColorCustom.grey,
+          title: text("Enter your coin: ", color: Colors.amber),
+          content: TextField(
+            controller: coinController,
+            style: TextStyle(
+              fontSize: 20.0,
+              fontFamily: 'Lato',
+              fontWeight: FontWeight.w400,
+              color: Colors.amber,
+            ),
+            cursorColor: Colors.black,
+            decoration: InputDecoration(
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black)
+              )
+            ),
+          ),
+          actions: <Widget>[
+            MaterialButton(
+              elevation: 5.0,
+              child: text('Cancel',size: 20, color: Colors.amber),
+              onPressed: () async{
+                Navigator.pop(context);
+              },
+            ),
+            MaterialButton(
+              elevation: 5.0,
+                child: text('Confirm buy',size: 20 ,color: Colors.amber),
+              onPressed: () async{
+                if (coinController.text.contains(RegExp(r'[a-z]'))){
+                  coinController.text = "";
+                  createAlertDialog("Input only number", context);
+                } else {
+                  int coin = int.parse(coinController.text);
+                  int result = await transactionForCoin(userBloC, coin);
+
+                  if (result == 0){
+                    int count = 0;
+                    createAlertDialog("Successful Transaction", parentContext);
+                    Navigator.of(context).popUntil((_) => count++ >= 3);
+                  } 
+                  else createAlertDialog("Fail Transaction", context);
+                }
+              },
+            )
+          ],
+        );
+      }
+    );
+  }
+
 
 }

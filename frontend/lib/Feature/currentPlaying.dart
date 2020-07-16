@@ -1,9 +1,9 @@
 import 'package:MusicApp/Custom/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flute_music_player/flute_music_player.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 import 'package:MusicApp/Data/mainControlBloC.dart';
-import 'package:MusicApp/Custom/custemText.dart';
+import 'package:MusicApp/Custom/customText.dart';
 import 'package:rxdart/rxdart.dart';
 
 class CurrentPlayBar extends StatefulWidget {
@@ -104,7 +104,7 @@ class CurrentPlayBarState extends State<CurrentPlayBar> {
         size: 60,
       ), 
       onPressed: (){
-        playerState != PlayerState.paused ? mp.pause() : mp.play(currentSong);
+        playerState != PlayerState.paused ? mp.pause() : mp.playSong(currentSong);
       }
     );
   }
