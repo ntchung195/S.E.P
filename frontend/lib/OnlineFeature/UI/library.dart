@@ -2,15 +2,13 @@
 // import 'package:MusicApp/Feature/currentPlaying.dart';
 // import 'package:MusicApp/Feature/musicPlayer.dart';
 import 'package:MusicApp/Data/mainControlBloC.dart';
-import 'package:MusicApp/Data/playlistModel.dart';
 import 'package:MusicApp/Data/userModel.dart';
 import 'package:MusicApp/OnlineFeature/UI/playlist.dart';
 import 'package:MusicApp/OnlineFeature/httpService.dart';
 import 'package:flutter/material.dart';
 import 'package:MusicApp/Custom/color.dart';
 import 'package:MusicApp/Custom/customIcons.dart';
-import 'package:MusicApp/Custom/custemText.dart';
-import 'package:MusicApp/OnlineFeature/httpService.dart';
+import 'package:MusicApp/Custom/customText.dart';
 import 'package:provider/provider.dart';
 
 
@@ -57,7 +55,7 @@ class _LibraryState extends State<Library> {
                 UserModel userInfo =  mp.infoBloC.userInfo.value;
                 //String username = userInfo.name;
                 //List<String> playlists = await fetchPlaylist(userInfo.name);
-                mp.infoBloC.fetchPlaylists("Tri");
+                mp.infoBloC.fetchPlaylists(userInfo.name);
                 Navigator.push(context, 
                   MaterialPageRoute(
                     builder: (context) => Playlists(mp, userInfo),

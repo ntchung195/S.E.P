@@ -1,4 +1,5 @@
 import 'package:MusicApp/Custom/sizeConfig.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:MusicApp/Custom/color.dart';
 import 'package:MusicApp/Custom/customIcons.dart';
@@ -128,21 +129,26 @@ class SignUp extends StatelessWidget {
       buttonColor: Colors.white,
       child: RaisedButton(
         onPressed: (() async {
-          final email = emailInput.text.trimRight();
-          final username = usernameInput.text.trimRight();
-          final password = passwordInput.text.trimRight();
-          if (password != passwordInput2.text.trimRight())
-            createAlertDialog("Check confirm password again",context);
-          else {
-            final int reponse = await createUser(email, username, password);
-            if (reponse == 1)
-              createAlertDialog("Username exists",context);
-            else if (reponse == 0) {
-              createAlertDialog("Sign Up Successfully",context)
-              .then((value) => Navigator.pop(context));
+          var connectivityResult = await (Connectivity().checkConnectivity());
+          if (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile) {
+            final email = emailInput.text.trim();
+            final username = usernameInput.text.trim();
+            final password = passwordInput.text.trim();
+            if (password != passwordInput2.text.trim())
+              createAlertDialog("Check confirm password again",context);
+            else {
+              final int reponse = await createUser(email, username, password);
+              if (reponse == 1)
+                createAlertDialog("Username exists",context);
+              else if (reponse == 0) {
+                createAlertDialog("Sign Up Successfully",context)
+                .then((value) => Navigator.pop(context));
+              }
+              else
+                createAlertDialog("Fail",context);
             }
-            else
-              createAlertDialog("Fail",context);
+          } else if (connectivityResult == ConnectivityResult.none) {
+            createAlertDialog("No Internet Connection",context);
           }
         }),
         shape: new RoundedRectangleBorder(

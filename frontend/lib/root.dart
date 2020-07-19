@@ -1,5 +1,4 @@
 import 'package:MusicApp/Data/mainControlBloC.dart';
-import 'package:MusicApp/Data/userModel.dart';
 import 'package:MusicApp/Feature/currentPlaying.dart';
 import 'package:MusicApp/Feature/downloadlist.dart';
 import 'package:MusicApp/Feature/musicPlayer.dart';
@@ -9,7 +8,7 @@ import 'package:MusicApp/OnlineFeature/UI/searchPage.dart';
 import 'package:flutter/material.dart';
 import 'package:MusicApp/Custom/color.dart';
 import 'package:provider/provider.dart';
-import 'package:MusicApp/Custom/custemText.dart';
+import 'package:MusicApp/Custom/customText.dart';
 
 import 'Custom/sizeConfig.dart';
 
