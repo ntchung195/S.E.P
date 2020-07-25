@@ -1,70 +1,42 @@
-[
-  {
-    "_id": {
-      "$oid": "5ef1e14d29bf993584dedeab"
-    },
-    "list_name": "PotatoAim",
-    "song": [
-      {
-        "songId": "5ef0c81fe055ef1c9be628dd",
-        "songName": "Potato"
-      },
-      {
-        "songId": "5ef0cb23e055ef1c9be628fc",
-        "songName": "Test"
-      },
-      {
-        "songId": "5ef0cb23e055ef1c9be628fd",
-        "songName": "Test1"
-      },
-      {
-        "songId": "5ef0cb23e055ef1c9be628fe",
-        "songName": "Test2"
-      }
-    ],
-    "user": {
-      "id": "5eb4048961f2042d286fd175",
-      "user_name": "Martin Scorsese"
-    },
-    "createdAt": {
-      "$date": "2020-06-23T12:08:02.872Z"
-    },
-    "modifiedAt": {
-      "$date": "2020-06-23T12:08:02.872Z"
-    }
+[{
+  "_id": {
+    "$oid": "5f0c8f00494be02d646cab02"
   },
-  {
-    "_id": {
-      "$oid": "5ef1f5a75ae1ba9f4379e78d"
+  "username": "Tri",
+  "list_name": "Feels high",
+  "song": [
+    {
+      "_id": {
+        "$oid": "5ef46fd64471913e20029881"
+      },
+      "title": "Unravel"
     },
-    "list_name": "Tomatoes",
-    "song": [],
-    "user": {
-      "id": "Martin Scorsese",
-      "user_name": "5eb4048961f2042d286fd175"
+    {
+      "_id": {
+        "$oid": "5ef46fca4471913e20029880"
+      },
+      "id": "2",
+      "title": "lovely"
     },
-    "createdAt": {
-      "$date": "2020-06-23T12:29:27.339Z"
-    },
-    "modifiedAt": {
-      "$date": "2020-06-23T12:29:27.339Z"
+    {
+      "_id": {
+        "$oid": "5ef46fbe4471913e2002987f"
+      },
+      "title": "Karthasis"
     }
+  ]
+},{
+  "_id": {
+    "$oid": "5f11a6955f6f7dccdbaf201d"
   },
-  {
-    "_id": {
-      "$oid": "5ef1f5c46a99933c346ab971"
-    },
-    "list_name": "Tomatoes",
-    "song": [],
-    "user": {
-      "id": "Martin Scorsese",
-      "user_name": "5eb4048961f2042d286fd175"
-    },
-    "createdAt": {
-      "$date": "2020-06-23T12:29:56.915Z"
-    },
-    "modifiedAt": {
-      "$date": "2020-06-23T12:29:56.915Z"
+  "username": "Tri",
+  "list_name": "Feels bad",
+  "song": [
+    {
+      "_id": {
+        "$oid": "5ef46f924471913e2002987c"
+      },
+      "title": "Co Shu nie"
     }
-  }
-]
+  ]
+}]
