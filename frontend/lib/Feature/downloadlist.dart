@@ -1,6 +1,7 @@
+import 'package:MusicApp/BloC/globalBloC.dart';
 import 'package:MusicApp/Custom/color.dart';
 import 'package:MusicApp/Custom/customIcons.dart';
-import 'package:MusicApp/Data/mainControlBloC.dart';
+import 'package:MusicApp/BloC/musicplayerBloC.dart';
 import 'package:MusicApp/Feature/currentPlaying.dart';
 import 'package:MusicApp/Feature/musicPlayer.dart';
 import 'package:MusicApp/OnlineFeature/UI/userProfile.dart';
@@ -37,7 +38,7 @@ class _DownloadlistState extends State<Downloadlist> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
+
     return SafeArea(
       child: Scaffold(
         appBar: appBar(context),
@@ -50,19 +51,9 @@ class _DownloadlistState extends State<Downloadlist> {
               shuffleButton(),
               SizedBox(height: SizeConfig.screenHeight*7/640),
               musicList(),
-              isUsed 
-                ? GestureDetector(
-                    onTap: (){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MusicPlayer(mp)
-                          )
-                      );
-                    },
-                    child: CurrentPlayBar(mp)
-                  ) 
-                : Container(),
+              widget._isOnline
+                ? onlineHandle()
+                : offlineHandle(),
             ],
           ),
         ),
@@ -70,8 +61,44 @@ class _DownloadlistState extends State<Downloadlist> {
     );
   }
 
+  Widget onlineHandle(){
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
+    return StreamBuilder<bool>(
+      stream: mpBloC.isUsed,
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
+        if (!snapshot.hasData){
+          return Container();
+        }
+        return !snapshot.data
+          ? Container(height: 70)
+          : Container(height: 135);
+      },
+    );
+  }
+
+  Widget offlineHandle(){
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mp = globalBloC.mpBloC;
+    return isUsed
+    ? GestureDetector(
+        onTap: (){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MusicPlayer(globalBloC)
+              )
+          );
+        },
+        child: CurrentPlayBar(globalBloC)
+      ) 
+    : Container();
+  }
+
+
   Widget userButton(BuildContext context){
-    final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mp = globalBloC.mpBloC;
     return IconButton(
       iconSize: 30,
       icon: Container(
@@ -91,7 +118,7 @@ class _DownloadlistState extends State<Downloadlist> {
         
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => UserProfile(mp))
+          MaterialPageRoute(builder: (context) => UserProfile(globalBloC))
         );
       }
     );
@@ -123,7 +150,8 @@ class _DownloadlistState extends State<Downloadlist> {
   }
 
   Widget shuffleButton(){
-    final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
     return ButtonTheme(
       height: 31,
       minWidth: 158,
@@ -133,11 +161,11 @@ class _DownloadlistState extends State<Downloadlist> {
           setState(() {
             isUsed = true;
           });
-          mp.stop();
-          mp.isUsed.add(true);
-          mp.fromDB.add(false);
-          mp.updatePlaylist(mp.songList.value);
-          mp.playRandomSong();
+          mpBloC.stop();
+          mpBloC.isUsed.add(true);
+          mpBloC.playMode(2);
+          mpBloC.updatePlaylist(mpBloC.songList.value);
+          mpBloC.playRandomSong();
         }),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
@@ -236,11 +264,12 @@ class _DownloadlistState extends State<Downloadlist> {
   }
 
   Widget musicList(){
-    final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
     return StreamBuilder<List<Song>>(
-      stream: mp.songList,
+      stream: mpBloC.songList,
       builder: (BuildContext context, AsyncSnapshot<List<Song>> snapshot){
-        if (mp.isDispose) return Container();
+        if (mpBloC.isDispose) return Container();
         if (!snapshot.hasData) {
           return Center(
             child: CircularProgressIndicator(
@@ -251,25 +280,24 @@ class _DownloadlistState extends State<Downloadlist> {
         }
 
         _songList = snapshot.data;
-        // _filterList = _songList;
+        if (_songList.length == 0) {
+          return empTylist();
+        }
+
         _filterList = _songList.where((element) => 
           (element.title.toLowerCase().contains(_filterkey.toLowerCase()) || 
           element.artist.toLowerCase().contains(_filterkey.toLowerCase())))
           .toList();
-        if (_songList.length == 0) {
-          return empTylist();
-        }
+
         return Expanded(
           child: ListView.builder(
             physics: BouncingScrollPhysics(),
-            itemCount: _filterList.length + 1,
+            itemCount: _filterList.length,
             itemBuilder: (BuildContext context, int index){
-              if (index == _filterList.length) 
-                return widget._isOnline ? Container(height: 60) : Container();
               Song _song = _filterList[index];
-              return songTile(mp, _song, _songList);
-              },                                     
-            ),
+              return songTile(_song, _songList);
+            },                                     
+          ),
         );
       },
 
@@ -313,7 +341,9 @@ class _DownloadlistState extends State<Downloadlist> {
     // }
   }
 
-  Widget songTile(MainControllerBloC mp, Song song, List<Song> songList){
+  Widget songTile(Song song, List<Song> songList){
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
     return ListTile(
       leading: song.albumArt == null ? musicIcon() : musicArt(song),
       title: Text(
@@ -341,11 +371,10 @@ class _DownloadlistState extends State<Downloadlist> {
         setState(() {
           isUsed = true;
         });
-        mp.isUsed.add(true);
-        mp.fromDB.add(false);
-        mp.updatePlaylist(songList);
-        mp.stop();
-        mp.playSong(song);
+        mpBloC.isUsed.add(true);
+        mpBloC.updatePlaylist(songList);
+        mpBloC.stop();
+        mpBloC.handleSong(song);
       },
     );
   }

@@ -1,4 +1,4 @@
-import 'package:MusicApp/Data/mainControlBloC.dart';
+import 'package:MusicApp/BloC/musicplayerBloC.dart';
 import 'package:MusicApp/Feature/currentPlaying.dart';
 import 'package:MusicApp/Feature/downloadlist.dart';
 import 'package:MusicApp/Feature/musicPlayer.dart';
@@ -10,6 +10,7 @@ import 'package:MusicApp/Custom/color.dart';
 import 'package:provider/provider.dart';
 import 'package:MusicApp/Custom/customText.dart';
 
+import 'BloC/globalBloC.dart';
 import 'Custom/sizeConfig.dart';
 
 
@@ -52,7 +53,8 @@ class _RootWidgetState extends State<RootWidget> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mp = globalBloC.mpBloC;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -73,7 +75,7 @@ class _RootWidgetState extends State<RootWidget> with SingleTickerProviderStateM
             bottom: 0,
             child: Column(
               children: <Widget> [
-                currentPlaying(mp),
+                currentPlaying(),
                 Theme(
                   data: Theme.of(context).copyWith(
                     canvasColor: ColorCustom.grey,
@@ -88,7 +90,9 @@ class _RootWidgetState extends State<RootWidget> with SingleTickerProviderStateM
     );
   }
 
-  Widget currentPlaying(MainControllerBloC mp){
+  Widget currentPlaying(){
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mp = globalBloC.mpBloC;
     return StreamBuilder<bool>(
       stream: mp.isUsed,
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
@@ -102,11 +106,11 @@ class _RootWidgetState extends State<RootWidget> with SingleTickerProviderStateM
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MusicPlayer(mp),
+                  builder: (context) => MusicPlayer(globalBloC),
                 )
               );
             },
-            child: CurrentPlayBar(mp)
+            child: CurrentPlayBar(globalBloC)
           );
       },
     );

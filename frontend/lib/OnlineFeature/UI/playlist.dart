@@ -1,12 +1,13 @@
 import 'dart:ui';
 
-import 'package:MusicApp/Data/mainControlBloC.dart';
+import 'package:MusicApp/BloC/globalBloC.dart';
+import 'package:MusicApp/BloC/musicplayerBloC.dart';
+import 'package:MusicApp/BloC/userBloC.dart';
 import 'package:MusicApp/Data/songModel.dart';
-
-import 'package:MusicApp/Data/userModel.dart';
 import 'package:MusicApp/Feature/currentPlaying.dart';
 import 'package:MusicApp/Feature/musicPlayer.dart';
 import 'package:MusicApp/OnlineFeature/httpService.dart';
+import 'package:flute_music_player/flute_music_player.dart';
 import 'package:flutter/material.dart';
 import 'package:MusicApp/Custom/color.dart';
 
@@ -16,9 +17,8 @@ import 'package:MusicApp/Custom/customText.dart';
 
 class Playlists extends StatefulWidget {
 
-  final MainControllerBloC mp;
-  final UserModel userInfo;
-  Playlists(this.mp, this.userInfo);
+  final GlobalBloC gBloC;
+  Playlists(this.gBloC);
 
   @override
   _PlaylistsState createState() => _PlaylistsState();
@@ -28,6 +28,17 @@ class Playlists extends StatefulWidget {
 class _PlaylistsState extends State<Playlists> {
 
   bool isUsed = false;
+  GlobalBloC globalBloC;
+  UserBloC userBloC;
+  MusicPlayerBloC mpBloC;
+
+  @override
+  void initState() {
+    super.initState();
+    globalBloC = widget.gBloC;
+    userBloC = globalBloC.userBloC;
+    mpBloC = globalBloC.mpBloC;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +64,7 @@ class _PlaylistsState extends State<Playlists> {
               bottom: 0,
               child: Column(
                 children: <Widget> [
-                  currentPlaying(widget.mp),
+                  currentPlaying(),
                 ]
               )
             ),            
@@ -64,11 +75,10 @@ class _PlaylistsState extends State<Playlists> {
   }
 
   Widget body(){
-    MainControllerBloC _mp = widget.mp;
     return Container(
       color: Colors.black,
       child: StreamBuilder(
-        stream: _mp.infoBloC.playlists,
+        stream: userBloC.playlists,
         builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot){
           if (!snapshot.hasData){
             return Center(
@@ -104,7 +114,7 @@ class _PlaylistsState extends State<Playlists> {
             ),
           );
         if (index == playlists.length + 1) 
-          return widget.mp.isUsed.value ? Container(height: 60) : Container();
+          return mpBloC.isUsed.value ? Container(height: 60) : Container();
         String playlist = playlists[index];
         return playListCard(playlist);
         },                                     
@@ -119,10 +129,78 @@ class _PlaylistsState extends State<Playlists> {
         color: ColorCustom.orange,
         size: 45,
       ),
+      onTap: () async {
+        List<Song> songs = await getPlaylist(userBloC.userInfo.value.name, playlist);
+        mpBloC.isUsed.add(true);
+        mpBloC.updatePlaylist(songs);
+        mpBloC.stop();
+        mpBloC.handleSong(songs[0]);
+      },
       title: TextLato(playlist, Colors.white, 22, FontWeight.w700),
       trailing: moreSetting(playlist),
     );
   }
+
+  Widget moreSetting(String playlist){
+    return PopupMenuButton<int>(
+      color: ColorCustom.grey,
+      icon: Icon(
+        Icons.more_vert,
+        color: Colors.white,
+        size: 30.0,
+      ),
+      itemBuilder: (BuildContext context) 
+        => <PopupMenuEntry<int>>[
+            PopupMenuItem<int>(
+              value: 1,
+              child: Text(
+                "Open",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Lato',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            PopupMenuItem<int>(
+              value: 2,
+              child: Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Lato',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
+                )
+              ),
+            )
+      ],
+//Function for Upload and Add to playlist
+      onSelected: (val) async{
+        if (val == 1){
+          List<Song> songs = await getPlaylist(userBloC.userInfo.value.name, playlist);
+          userBloC.currentPlaylist.add(songs);
+          songList(context, playlist);
+        }
+          
+        else {
+          print("Delete this playlist");
+          int result = await deletePlaylist(playlist, userBloC.userInfo.value.name);
+          if (result == 1) {
+            createAlertDialog("Delete $playlist Successfully", context);
+            userBloC.playlists.value.remove(playlist);
+            userBloC.playlists.add(userBloC.playlists.value);
+          }
+          else {
+            createAlertDialog("Fail to delete", context);
+          }
+        }
+      },
+//-----------------------------------------------------------
+    );
+  }
+
 
   Widget noPlaylist(){
     return Center(
@@ -164,9 +242,9 @@ class _PlaylistsState extends State<Playlists> {
     );
   }
 
-  Widget currentPlaying(MainControllerBloC mp){
+  Widget currentPlaying(){
     return StreamBuilder<bool>(
-      stream: mp.isUsed,
+      stream: mpBloC.isUsed,
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
         if (!snapshot.hasData){
           return Container();
@@ -178,11 +256,11 @@ class _PlaylistsState extends State<Playlists> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MusicPlayer(mp),
+                  builder: (context) => MusicPlayer(globalBloC),
                 )
               );
             },
-            child: CurrentPlayBar(mp)
+            child: CurrentPlayBar(globalBloC)
           );
       },
     );
@@ -191,14 +269,15 @@ class _PlaylistsState extends State<Playlists> {
   final TextEditingController customController = TextEditingController(text: "");
 
   Future<String> createPlaylistPopUp(BuildContext context){
+    BuildContext gcontext = context;
     return showDialog(
       context: context, 
-      builder: (context){
+      builder: (context) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
           child: AlertDialog(
-            backgroundColor: Colors.black,
-            title: TextLato("New playlist's name:",Colors.white, 20, FontWeight.w700),
+            backgroundColor: ColorCustom.grey,
+            title: TextLato("New playlist's name:",ColorCustom.orange, 20, FontWeight.w700),
             content: TextField(
               obscureText: false,
               controller: customController,
@@ -206,34 +285,38 @@ class _PlaylistsState extends State<Playlists> {
                 fontSize: 20.0,
                 fontFamily: 'Lato',
                 fontWeight: FontWeight.w400,
-                color: Colors.white,
+                color: ColorCustom.orange,
               ),
               cursorColor: Colors.white,
               decoration: InputDecoration(
                 enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white)
+                  borderSide: BorderSide(color: Colors.black)
                 ),
                 border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white)
+                  borderSide: BorderSide(color: Colors.black)
                 ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white)
+                  borderSide: BorderSide(color: Colors.black)
                 )
               ),
             ),
             actions: <Widget>[
               MaterialButton(
                 elevation: 5.0,
-                child: TextLato("Confirm",Colors.white, 20, FontWeight.w700),
-                onPressed: () async{
-                  List<String> playlists = await createPlaylist(customController.text, widget.userInfo.name);
-                  widget.mp.infoBloC.playlists.add(playlists);
+                child: TextLato("Confirm",ColorCustom.orange, 20, FontWeight.w700),
+                onPressed: () async {
+                  print("Username: ${userBloC.userInfo.value.name}");
+                  List<String> playlists = await createPlaylist(customController.text, userBloC.userInfo.value.name);
+                  if (playlists[0] == "") createAlertDialog("Duplicated", gcontext);
+                  else if (playlists == null) createAlertDialog("Server Error", context);
+                  else
+                    userBloC.playlists.add(playlists);
                   Navigator.pop(context);
                 },
               ),
               MaterialButton(
                 elevation: 5.0,
-                  child: TextLato("Cancel",Colors.white, 20, FontWeight.w700),
+                  child: TextLato("Cancel",ColorCustom.orange, 20, FontWeight.w700),
                 onPressed: (){
                   Navigator.of(context).pop(customController.text.toString());
                 },
@@ -245,7 +328,7 @@ class _PlaylistsState extends State<Playlists> {
     );
   }
 
-  Widget moreSetting(String playlist){
+  Widget songPopUpMenu(Song song, List<Song> songs, String playlist){
     return PopupMenuButton<int>(
       color: ColorCustom.grey,
       icon: Icon(
@@ -281,56 +364,24 @@ class _PlaylistsState extends State<Playlists> {
             )
       ],
 //Function for Upload and Add to playlist
-      onSelected: (val){
-        if (val == 1)
-          songList(context, widget.mp, playlist);
-        else print("Delete this playlist");
-      },
-//-----------------------------------------------------------
-    );
-  }
-
-
-  Widget songPopUpMenu(String songTitle){
-    return PopupMenuButton<int>(
-      color: ColorCustom.grey,
-      icon: Icon(
-        Icons.more_vert,
-        color: Colors.white,
-        size: 30.0,
-      ),
-      itemBuilder: (BuildContext context) 
-        => <PopupMenuEntry<int>>[
-            PopupMenuItem<int>(
-              value: 1,
-              child: Text(
-                "Open",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Lato',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            PopupMenuItem<int>(
-              value: 2,
-              child: Text(
-                "Delete",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Lato',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 18,
-                )
-              ),
-            )
-      ],
-//Function for Upload and Add to playlist
-      onSelected: (val){
-        if (val == 1)
-          print("Song sample");
-        else print("Delete this song");
+      onSelected: (val) async{
+        if (val == 1){
+          mpBloC.isUsed.add(true);
+          mpBloC.updatePlaylist(songs);
+          mpBloC.stop();
+          mpBloC.handleSong(song);
+        }
+        else {
+          int result = await playlistDelete(playlist, userBloC.userInfo.value.name, song.iD);
+          if (result == 1) {
+            songs.remove(song);
+            userBloC.currentPlaylist.add(songs);
+            createAlertDialog("Delete Successfully", context);
+          }
+          else {
+            createAlertDialog("Delete Fail", context);
+          }
+        }
       },
 //-----------------------------------------------------------
     );
@@ -357,7 +408,7 @@ class _PlaylistsState extends State<Playlists> {
     );
   }
 
-  Future<String> songList(BuildContext context, MainControllerBloC mp, String playlist){
+  Future<String> songList(BuildContext context, String playlistname){
     return showDialog(
       context: context, 
       builder: (context){
@@ -373,14 +424,14 @@ class _PlaylistsState extends State<Playlists> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    TextLato(playlist, ColorCustom.orange, 25, FontWeight.w500),
+                    TextLato(playlistname, ColorCustom.orange, 25, FontWeight.w500),
                   ],
                 ),
                 SizedBox(height: 10),
                 Expanded(
                   child: StreamBuilder(
-                    stream: widget.mp.infoBloC.currentPlaylist,
-                    builder: (BuildContext context, AsyncSnapshot<List<SongItem>> snapshot){
+                    stream: userBloC.currentPlaylist,
+                    builder: (BuildContext context, AsyncSnapshot<List<Song>> snapshot){
                       if (!snapshot.hasData){
                         return Center(
                           child: CircularProgressIndicator(
@@ -389,13 +440,18 @@ class _PlaylistsState extends State<Playlists> {
                           ),
                         );
                       }
-                      List<SongItem> playlists = snapshot.data;
+                      List<Song> songs = snapshot.data;
                       //print(playlists);
-                      if (playlists.length == 0){
-                        return noPlaylist();
+                      if (songs.length == 0){
+                        return Container(
+                          child: Center(
+                            child: TextLato("Song Not Found", Colors.white, 20, FontWeight.w700),
+                          )
+                        );
                       }
-                      else
-                        return listSongs(context, playlists);
+                      else {
+                        return listSongs(context, songs, playlistname);
+                      }
                     }
                   ),
                 ),
@@ -408,26 +464,32 @@ class _PlaylistsState extends State<Playlists> {
     );
   }
 
-  Widget listSongs(BuildContext context, List<SongItem> playlist){
+  Widget listSongs(BuildContext context, List<Song> songs,  String playlist){
     return ListView.builder(
       physics: BouncingScrollPhysics(),
-      itemCount: playlist.length,
+      itemCount: songs.length,
       itemBuilder: (BuildContext context, int index){
-        String songTitle = playlist[index].title;
-        return songTile(songTitle);
+        //String songTitle = playlist[index].title;
+        return songTile(songs[index], songs, playlist);
         },                                     
     );
   }
 
-  Widget songTile(String song){
+  Widget songTile(Song song, List<Song> songs, String playlist){
     return ListTile(
       contentPadding: EdgeInsets.only(left: 30),
       leading: musicIcon(),
-      title: TextLato(song, Colors.white, 22, FontWeight.w700),
+      title: TextLato(song.title, Colors.white, 22, FontWeight.w700),
+      subtitle: TextLato(song.artist, Colors.grey, 17, FontWeight.w500),
       onTap: () async{
 
+        mpBloC.isUsed.add(true);
+        mpBloC.updatePlaylist(songs);
+        mpBloC.stop();
+        mpBloC.handleSong(song);
+
       },
-      trailing: songPopUpMenu(song),
+      trailing: songPopUpMenu(song, songs, playlist),
     );
   }
 
