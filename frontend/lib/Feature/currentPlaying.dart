@@ -1,15 +1,16 @@
+import 'package:MusicApp/BloC/globalBloC.dart';
 import 'package:MusicApp/Custom/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flute_music_player/flute_music_player.dart';
 // import 'package:provider/provider.dart';
-import 'package:MusicApp/Data/mainControlBloC.dart';
+import 'package:MusicApp/BloC/musicplayerBloC.dart';
 import 'package:MusicApp/Custom/customText.dart';
 import 'package:rxdart/rxdart.dart';
 
 class CurrentPlayBar extends StatefulWidget {
   
-  final MainControllerBloC _mp;
-  CurrentPlayBar(this._mp);
+  final GlobalBloC _gBloC;
+  CurrentPlayBar(this._gBloC);
 
 
   @override
@@ -20,9 +21,7 @@ class CurrentPlayBarState extends State<CurrentPlayBar> {
 
   @override
   Widget build(BuildContext context) {
-
-    //final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
-    final MainControllerBloC mp = widget._mp;
+    final MusicPlayerBloC mp = widget._gBloC.mpBloC;
     return Container(
       decoration: BoxDecoration(
         color: ColorCustom.grey,
@@ -94,7 +93,7 @@ class CurrentPlayBarState extends State<CurrentPlayBar> {
     );
   }
 
-  Widget playIconButton(Song currentSong, MainControllerBloC mp,PlayerState playerState){
+  Widget playIconButton(Song currentSong, MusicPlayerBloC mp,PlayerState playerState){
     return IconButton(
       padding: EdgeInsets.all(0),
       iconSize: 60,
@@ -104,7 +103,7 @@ class CurrentPlayBarState extends State<CurrentPlayBar> {
         size: 60,
       ), 
       onPressed: (){
-        playerState != PlayerState.paused ? mp.pause() : mp.playSong(currentSong);
+        playerState != PlayerState.paused ? mp.pause() : mp.play();
       }
     );
   }
