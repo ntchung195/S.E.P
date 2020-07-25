@@ -1,0 +1,68 @@
+81683fe (HEAD -> musicappFunction, origin/musicappFunction) Voice update
+c144ddc Voice update
+6469633 Vip and Coin
+dd940b5 Add Voice Recorder
+2cf7e16 Listen online music update
+fa6d20f 23-6-20
+3b8c8f1 Update user
+f580758 update
+4899172 playlist button
+d106bfc 10:06,15-6-20
+4c2379f Fetch Favourite List and Song from DB
+c193f5e Get User Profile from DB
+606a957 Some app image
+0c5bac3 Animation Transition
+7c3a3b8 IconLauncher and SplashScreen
+5631780 Ver 3
+63f6091 Music Player with BloC pattern
+034d718 (dev) 21-5
+db197a8 Add user profile page
+8e53ba5 remove conflict
+f5c65b1 Hompage 2.2.2
+6737fc5 Homepage 2.2.1
+2aa00dd Delete .flutter-plugins-dependencies
+3fbb99d Homepage 2.2
+38f925d Update .flutter-plugins-dependencies
+73daf28 Homepage 2.2
+4b691e8 Merge pull request #14 from sangn2911/feature/onlinefeature
+4959957 Homepage 2.2
+9c703d1 HomePage Update 2.1
+5f73055 Merge branch 'dev' of https://github.com/sangn2911/MusicApp into dev
+66c53f7 Merge branch 'feature/offlinefeature' into dev
+0deac33 Update HomePage 2
+131ef79 Merge pull request #13 from sangn2911/feature/offlinefeature
+2f7da8b Homepage Update
+5500cf7 Update Login and Sign Up
+a10a60a 12345
+8753361 Merge pull request #12 from sangn2911/feature/offlinefeature
+6b5f679 Musis Player OK for NOW
+c1f87f6 Merge pull request #11 from sangn2911/feature/offlinefeature
+cd50e9e Play music temporarily
+f69c2c0 Play Music ver1.3
+2a55f5d Play music ver1.2
+0e08100 Play Music ver1.1
+258d96b Play Music ver1
+bca31eb Read storage
+97ea91e Read storage
+a96816c first
+464de56 Merge branch 'feature/offline_feature' into dev
+5b462a9 3rd on feature
+0665d2a 2nd on feature
+238db40 1st on fearture
+1eba142 Merge pull request #8 from sangn2911/test
+65c04e1 (origin/test, test) Nineth
+d1e12fe Merge pull request #7 from sangn2911/test
+220272c Eighth
+8e3ef0e Merge pull request #6 from sangn2911/test
+3df20d0 Seventh
+e9ae331 Merge pull request #5 from sangn2911/test
+8746712 Sixth
+219325c Fifth
+b18c781 Merge pull request #3 from sangn2911/test
+8e44b0f Fourth
+becb844 Third
+02a769e Merge pull request #2 from sangn2911/test
+72253dd Second
+71ecd75 Merge pull request #1 from sangn2911/dev
+2da501e (offline_feature) First Commit
+4d9b425 (master) Initial commit
