@@ -107,7 +107,7 @@ def get_user_id(user_name):
     """
     Get User ID By Name
     """
-    data =db.userInfo.find_one({"name":user_name})
+    data =db.userInfo.find_one({"username":user_name})
     if data is None:
         return
     else:
@@ -144,8 +144,9 @@ def get_list():
     data = db.songInfo.find({})
     res = []
     for document in data:
+        # print(document)
         res.append({"_id": str(document['_id']),"title":str(document['songName']),"artist":str(document['artist'])})
-        print(document)
+        
     
     return res
 

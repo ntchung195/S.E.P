@@ -1,0 +1,37 @@
+[{
+  "_id": {
+    "$oid": "5ebfe484fefc3b092c658bd0"
+  },
+  "coin": 12323,
+  "username": "Edgar Wright"
+},{
+  "_id": {
+    "$oid": "5ebfe498fefc3b092c658bd1"
+  },
+  "coin": 0,
+  "username": "Quentin Tarrantino"
+},{
+  "_id": {
+    "$oid": "5ebfe4a2fefc3b092c658bd2"
+  },
+  "coin": 4450,
+  "username": "Martin Scorsese"
+},{
+  "_id": {
+    "$oid": "5ed335a121bb6c2ba0d585a6"
+  },
+  "username": "sangNguyen",
+  "coin": 82554
+},{
+  "_id": {
+    "$oid": "5ee5f33e9eb72611b07ef407"
+  },
+  "username": "qq1",
+  "coin": 82554
+},{
+  "_id": {
+    "$oid": "5ef0ac88a84d8b9275a0ed29"
+  },
+  "username": "1",
+  "coin": 0
+}]

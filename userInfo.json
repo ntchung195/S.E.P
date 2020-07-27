@@ -1,27 +1,61 @@
-{
-  "_id": "5eb3fa240ad868bc0c9e7549",
-  "email": "edgar123@gmail.com",
+[{
+  "_id": {
+    "$oid": "5eb3fa240ad868bc0c9e7549"
+  },
   "password": "thgirwragde",
+  "username": "Edgar Wright",
+  "email": "edgar123@gmail.com",
   "phone": "0919246969",
-  "playList": [],
-  "timeLog": {},
-  "user_name": "EdgarWright"
-},
-{
-  "_id": "5eb403e361f2042d286fd174",
-  "email": "quentin123@gmail.com",
-  "name": "QuentinTarrantino",
+  "status": 1,
+  "isLog": 0
+},{
+  "_id": {
+    "$oid": "5eb403e361f2042d286fd174"
+  },
   "password": "feetjustfeet",
+  "username": "Quentin Tarrantino",
+  "email": "quentin123@gmail.com",
   "phone": "0919249696",
-  "playList": [],
-  "timeLog": {}
-},
-{
-  "_id": "5eb4048961f2042d286fd175",
-  "email": "martin@gmail.com",
-  "name": "Martin Scorsese",
+  "status": 0,
+  "isLog": 0
+},{
+  "_id": {
+    "$oid": "5eb4048961f2042d286fd175"
+  },
   "password": "drugs",
+  "username": "Martin Scorsese",
+  "email": "martin@gmail.com",
   "phone": "0919692469",
-  "playList": [],
-  "timeLog": {}
-},
+  "isLog": 0,
+  "status": 1
+},{
+  "_id": {
+    "$oid": "5ed207f32fee399efd75fd09"
+  },
+  "username": "qq1",
+  "password": "qq",
+  "email": "qq1",
+  "isLog": 0,
+  "status": 0,
+  "phone": "1212"
+},{
+  "_id": {
+    "$oid": "5ed224a92b8b904a34611188"
+  },
+  "username": "sangNguyen",
+  "password": "12345",
+  "email": "gg",
+  "status": 1,
+  "isLog": 0,
+  "phone": "1111111"
+},{
+  "_id": {
+    "$oid": "5ef0ac88a84d8b9275a0ed28"
+  },
+  "username": "1",
+  "password": "1",
+  "email": "000",
+  "status": 0,
+  "isLog": 0,
+  "phone": "5456464"
+}]

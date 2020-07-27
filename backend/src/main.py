@@ -196,7 +196,7 @@ def upday():
 
 @app.route('/song', methods = ['POST','GET'])
 def home():
-    playlist_coll=db.song
+    # playlist_coll=db.song
     play = db.playList
     #test.update({'username':'Obito','playlistName':'Feels Good'},{'$push':{'songName':'Trung doc'}})
     if request.method =='POST':
@@ -212,10 +212,13 @@ def home():
             return listsong.myPlaylist(result ,db)
         if type == 'addSong':
             return listsong.addSong(result,db)
-        if type == 'deleteSong':
-            return listsong.deleteSong(result,db)
+        if type == 'delSong':
+            return listsong.delSong(result,db)
         if type == 'fetchPlaylist':
-            return listsong.fetchPlaylisy(result,db)
+            return listsong.fetchPlaylist(result ,db)
+        if type == 'deletePlaylist':
+            return listsong.delPlaylist(result,db)
+
             
     return 'OK'
     

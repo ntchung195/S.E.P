@@ -142,7 +142,7 @@ def verify_model(register_gmm,regconize_wav,logging):
     logging.debug("log_likelihood respond : {}".format(str(log_likelihood)))
     logging.debug("Score sum respond : {}".format(str(scores.sum())))
 
-    if log_likelihood >= -0.4:
+    if log_likelihood >= -0.452:
         is_User = True
     else:
         is_User = False

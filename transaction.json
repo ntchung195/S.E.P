@@ -1,0 +1,63 @@
+[{
+  "_id": {
+    "$oid": "5ebfe74cfefc3b092c658bd3"
+  },
+  "Coin": 12,
+  "date": {
+    "$date": "2016-05-17T17:00:00Z"
+  },
+  "item": {
+    "type": "song",
+    "name": "Can We Kiss Forever"
+  },
+  "username": "Edgar Wright"
+},{
+  "_id": {
+    "$oid": "5ebfe77cfefc3b092c658bd4"
+  },
+  "Coin": 12,
+  "date": {
+    "$date": "2020-09-08T17:00:00Z"
+  },
+  "item": {
+    "type": "status",
+    "name": "VIP"
+  },
+  "username": "Quentin Tarantino"
+},{
+  "_id": {
+    "$oid": "5ed357b61a044354e89c4716"
+  },
+  "username": "sangNguyen",
+  "item": {
+    "name": "Thit cho",
+    "type": "song"
+  },
+  "date": {
+    "$date": "2020-05-31T14:07:34.928Z"
+  }
+},{
+  "_id": {
+    "$oid": "5ed3587bcec93c337bbabbd4"
+  },
+  "username": "sangNguyen",
+  "item": {
+    "name": "Thit cho",
+    "type": "song"
+  },
+  "date": {
+    "$date": "2020-05-31T14:10:51.328Z"
+  }
+},{
+  "_id": {
+    "$oid": "5ed3d8f807faa37e5382cdc3"
+  },
+  "username": "sangNguyen",
+  "item": {
+    "name": "VIP",
+    "type": "status"
+  },
+  "date": {
+    "$date": "2020-05-31T23:19:04.816Z"
+  }
+}]
