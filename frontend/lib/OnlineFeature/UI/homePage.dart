@@ -1,19 +1,14 @@
-import 'package:MusicApp/Data/mainControlBloC.dart';
-import 'package:MusicApp/Data/songModel.dart';
+import 'package:MusicApp/BloC/globalBloC.dart';
+import 'package:MusicApp/BloC/musicplayerBloC.dart';
+import 'package:MusicApp/Custom/customMarquee.dart';
 import 'package:MusicApp/OnlineFeature/UI/userProfile.dart';
-import 'package:MusicApp/OnlineFeature/httpService.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:flute_music_player/flute_music_player.dart';
 import 'package:flutter/material.dart';
 import 'package:MusicApp/Custom/color.dart';
 import 'package:MusicApp/Custom/customIcons.dart';
 import 'package:MusicApp/Custom/sizeConfig.dart';
 import 'package:provider/provider.dart';
-import 'package:MusicApp/OnlineFeature/UI/purchase.dart';
 import 'package:MusicApp/Custom/customText.dart';
-
-
-bool isUsed = false;
 
 class HomePage extends StatefulWidget {
 
@@ -29,6 +24,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: PreferredSize(
@@ -51,8 +48,19 @@ class _HomePageState extends State<HomePage> {
                     children: <Widget>[
                       recentlyList(),
                       favouriteList(),
-                      yourSongList(),
-                      !isUsed ? Container(height: 60) : Container(height: 130),
+                      offlineList(),
+                      StreamBuilder<bool>(
+                        stream: mpBloC.isUsed,
+                        builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
+                          if (!snapshot.hasData){
+                            return Container();
+                          }
+                          return !snapshot.data
+                            ? Container(height: 60)
+                            : Container(height: 130);
+                        },
+                      ),
+                      //!isUsed ? Container(height: 60) : Container(height: 130),
                     ]
                   ),
                 ),
@@ -65,7 +73,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget appBar(BuildContext context){
-    final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
     return AppBar(
       backgroundColor: Colors.black,
       centerTitle: true,
@@ -86,10 +94,9 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         onPressed: () async{
-
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => UserProfile(mp))
+            MaterialPageRoute(builder: (context) => UserProfile(globalBloC))
           );
           
         }
@@ -105,7 +112,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget recentlyList(){
-    //final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -114,25 +122,40 @@ class _HomePageState extends State<HomePage> {
           child: TextLato("Recently Play", Colors.white, 20, FontWeight.w700),
         ),
         SizedBox(height: 10/640 * SizeConfig.screenHeight),
-        Container(
-          //padding: EdgeInsets.only(left: 31/360 * SizeConfig.screenWidth),
-          height: 170/640 * SizeConfig.screenHeight,
-          color: Colors.black,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 6,
-            itemBuilder: (BuildContext context, int index){
-              Song songTemp = Song(0, "Artist $index", "Song $index", null, null, null, null, null, null);
-              return songTile(IconCustom.album_1, songTemp, true);
-            },
-          )
+        StreamBuilder<List<Song>>(
+          stream: mpBloC.recently,
+          builder: (context, snapshot) {
+            if (mpBloC.isDispose) return Container();
+
+            if (!snapshot.hasData) {
+                return circleLoading("Loading");
+              }
+
+            List<Song> _songList = snapshot.data;
+            if (_songList.length == 0) {
+              return Container();
+            }
+
+            return Container(
+              height: 170/640 * SizeConfig.screenHeight,
+              color: Colors.black,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _songList.length,
+                itemBuilder: (BuildContext context, int index){
+                  return songTile(IconCustom.album_1, _songList[index], _songList);
+                },
+              )
+            );
+          }
         ),
       ],
     );
   }
 
   Widget favouriteList(){
-    final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -142,28 +165,12 @@ class _HomePageState extends State<HomePage> {
         ),
         SizedBox(height: 10/640 * SizeConfig.screenHeight),
         StreamBuilder(
-          stream: mp.favourite,
+          stream: mpBloC.favourite,
           builder: (BuildContext context, AsyncSnapshot<List<Song>> snapshot){
-            if (mp.isDispose) return Container();
+            if (mpBloC.isDispose) return Container();
 
             if (!snapshot.hasData) {
-              return Container(
-                height: 170/640 * SizeConfig.screenHeight,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      CircularProgressIndicator(
-                        backgroundColor: Colors.black,
-                        valueColor: AlwaysStoppedAnimation(Colors.white),
-                      ),
-                      SizedBox(height: 30),
-                      TextLato("Waiting for server", Colors.white, 20, FontWeight.w500)
-                    ],
-                  ),
-                ),
-              );
+              return circleLoading("Waiting for server");
             }
 
             List<Song> _songList = snapshot.data;
@@ -178,7 +185,7 @@ class _HomePageState extends State<HomePage> {
                 scrollDirection: Axis.horizontal,
                 itemCount: _songList.length,
                 itemBuilder: (BuildContext context, int index){
-                  return songTile(IconCustom.album_1, _songList[index], false);
+                  return songTile(IconCustom.album_1, _songList[index], _songList);
                 },
               )
             );
@@ -188,8 +195,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget yourSongList(){
-    final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
+  Widget offlineList(){
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -198,23 +206,16 @@ class _HomePageState extends State<HomePage> {
         ),
         SizedBox(height: 10/640 * SizeConfig.screenHeight),
         Container(
-
           height: 170/640 * SizeConfig.screenHeight,
           color: Colors.black,
           child: StreamBuilder<List<Song>>(
-            stream: mp.songList,
+            stream: mpBloC.songList,
             builder: (BuildContext context, AsyncSnapshot<List<Song>> snapshot){
-              if (mp.isDispose) return Container();
+              if (mpBloC.isDispose) return Container();
               if (!snapshot.hasData) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.black,
-                    valueColor: AlwaysStoppedAnimation(Colors.white),
-                  ),
-                );
+                return circleLoading("Loading");
               }
               List<Song> _songList = snapshot.data;
-              // _filterList = _songList;
               if (_songList.length == 0) {
                 return Container();
               }
@@ -222,8 +223,7 @@ class _HomePageState extends State<HomePage> {
                 scrollDirection: Axis.horizontal,
                 itemCount: _songList.length,
                 itemBuilder: (BuildContext context, int index){
-                  Song _song = _songList[index];
-                  return songDownloaded(mp, IconCustom.album_1, _song, _songList);
+                  return songTile(IconCustom.album_1, _songList[index], _songList);
                 },
               );
             },
@@ -233,8 +233,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget songTile(IconData icon, Song _song, bool inPhone){
-    final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
+  Widget songTile(IconData icon, Song _song, List<Song> songlist){
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
     return Container(
       width: 150/360 * SizeConfig.screenWidth,
       child: Column(
@@ -251,17 +252,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             onPressed: () async {
-              setState(() {
-                isUsed = true;
-              });
-              
-              //mp.infoBloC.currentId.add(_song.iD);
-              mp.isUsed.add(true);
-              mp.fromDB.add(true);
-              mp.updatePlaylist(mp.favourite.value);
-              mp.stop();
-              mp.playSong(_song);
-              //print("Select song $title");
+              mpBloC.isUsed.add(true);
+              mpBloC.updatePlaylist(songlist);
+              mpBloC.stop();
+              mpBloC.handleSong(_song);
             },
           ),
           SizedBox(height: 5),
@@ -269,22 +263,25 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget> [
               Container(
+                width: 100,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget> [
-                    Container(
-                      width: 100,
-                      child: TextLato(_song.title, Colors.white, 20, FontWeight.w700)
-                    ),
-                    Container(
-                      width: 100,
-                      child: TextLato(_song.artist, ColorCustom.grey1, 14, FontWeight.w400)
-                      ),
+                    // CustomMarquee(_song.title, Colors.white, 20,FontWeight.w700),
+                    // CustomMarquee(_song.title, Colors.white, 20,FontWeight.w700),
+                    TextLato(_song.title, Colors.white, 20, FontWeight.w700),
+                    TextLato(_song.artist, ColorCustom.grey1, 14, FontWeight.w400),
                   ]
                 ),
               ),
-              SizedBox(width: 30),
-              inPhone ? Container() : purchaseButton(_song.title),
+              _song.iD != null 
+                ? Row(
+                  children: <Widget> [
+                    SizedBox(width: 20),
+                    purchaseButton(_song.title)
+                  ]
+                )
+                : Container(),
             ]
           )
         ]
@@ -311,79 +308,15 @@ class _HomePageState extends State<HomePage> {
 
   Widget songDecoration(Song song){
     return Container(
-        color: ColorCustom.orange,
-        child: Icon(
-          Icons.music_note,
-          color: Colors.black,
-        ),
-      ); 
-    // return song.albumArt == null
-    //   ? Container(
-    //     color: ColorCustom.orange,
-    //     child: Icon(
-    //       Icons.music_note,
-    //       color: Colors.black,
-    //     ),
-    //   ) 
-    //   : Container(
-    //     child: FadeInImage(
-    //       placeholder: NetworkImage(url), 
-    //       image: null
-    //     ),
-    //   );
-      // : Container(
-      //     child: Image(
-      //       fit: BoxFit.fill,
-      //       image: AssetImage(
-      //         song.albumArt,
-      //       )
-      //     ),
-      //   );
-  }
-
-
-  Widget songDownloaded(MainControllerBloC mp, IconData icon, Song song, List<Song> songList){
-    String title = song.title;
-    String artist = song.artist;
-    return Container(
-      width: 150/360 * SizeConfig.screenWidth,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget> [
-          IconButton(
-            padding: EdgeInsets.all(0),
-            iconSize: 110/640 * SizeConfig.screenHeight,
-            icon: songDecoration(song),
-            onPressed: (){
-              setState(() {
-                isUsed = true;
-              });
-              mp.updatePlaylist(songList);
-              mp.isUsed.add(true);
-              mp.stop();
-              mp.playSong(song);
-            },
-          ),
-          SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget> [
-              Container(
-                width: 120,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget> [
-                    TextLato(title, Colors.white, 20, FontWeight.w700),
-                    TextLato(artist, ColorCustom.grey1, 14, FontWeight.w400),
-                  ]
-                ),
-              ),
-            ]
-          )
-        ]
+      color: ColorCustom.orange,
+      child: Icon(
+        Icons.music_note,
+        color: Colors.black,
       ),
     );
   }
+
+
 
   Widget buttonSet(BuildContext context){
     return Container(
@@ -448,7 +381,27 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  await(Future<ConnectivityResult> checkConnectivity) {}
+  // await(Future<ConnectivityResult> checkConnectivity) {}
+
+  Widget circleLoading(String str){
+    return Container(
+      height: 170/640 * SizeConfig.screenHeight,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            CircularProgressIndicator(
+              backgroundColor: Colors.black,
+              valueColor: AlwaysStoppedAnimation(Colors.white),
+            ),
+            SizedBox(height: 30),
+            TextLato(str, Colors.white, 20, FontWeight.w500)
+          ],
+        ),
+      ),
+    );
+  }
 
 }
 

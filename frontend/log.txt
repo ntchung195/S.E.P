@@ -1,0 +1,445 @@
+commit 81683fedef19c7235fe94144a888b5d153a4ccf3
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sat Jun 27 22:06:08 2020 +0700
+
+    Voice update
+
+commit c144ddc525a07a755075a4c3285153bca54c846c
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Fri Jun 26 15:33:19 2020 +0700
+
+    Voice update
+
+commit 6469633d37cd79b30dc954fae5da5391bd634c7d
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu Jun 25 16:10:21 2020 +0700
+
+    Vip and Coin
+
+commit dd940b57e9908bc1c4cb1f5c4ec3e6deaf5d93a3
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu Jun 25 10:41:31 2020 +0700
+
+    Add Voice Recorder
+
+commit 2cf7e1608218076a5ad08e3ea871c79987207927
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Tue Jun 23 20:31:02 2020 +0700
+
+    Listen online music update
+
+commit fa6d20fd01df288cb394bbb5894a74f1c0a1abe7
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Tue Jun 23 15:33:36 2020 +0700
+
+    23-6-20
+
+commit 3b8c8f189f9f1a869fd6ad42243af1b642a38131
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Mon Jun 22 17:16:14 2020 +0700
+
+    Update user
+
+commit f580758d0b8a426b83d69f237c3bcad2831c7128
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Fri Jun 19 14:08:20 2020 +0700
+
+    update
+
+commit 489917205a7b6ded660e4c321a200e3d21930ca0
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu Jun 18 20:29:26 2020 +0700
+
+    playlist button
+
+commit d106bfc98d01930073ba7b50d969bd62553e70c9
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Mon Jun 15 22:07:12 2020 +0700
+
+    10:06,15-6-20
+
+commit 4c2379fa82d5f706e88e489d52dbeaf001ef4fac
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Mon Jun 15 19:10:46 2020 +0700
+
+    Fetch Favourite List and Song from DB
+
+commit c193f5e13b365f961c2492cb719d89d6eac9503a
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sun Jun 14 17:46:48 2020 +0700
+
+    Get User Profile from DB
+
+commit 606a9575d84e4de31454d9d5ba77754e46f32ae0
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sat Jun 13 11:07:42 2020 +0700
+
+    Some app image
+
+commit 0c5bac3f5fe09a4063205a3bbdc6ddcdeee0e6be
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sat Jun 13 10:49:27 2020 +0700
+
+    Animation Transition
+
+commit 7c3a3b88cff1c347b2f079b6c97ef1ac9ac0f241
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Mon Jun 8 13:28:41 2020 +0700
+
+    IconLauncher and SplashScreen
+
+commit 5631780051ed0885c4256ef56987f5bb3a9be06b
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Fri Jun 5 15:48:00 2020 +0700
+
+    Ver 3
+
+commit 63f60918eacb9e18b90b1cd4add22a132e32dffc
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sun May 31 20:40:23 2020 +0700
+
+    Music Player with BloC pattern
+
+commit 034d7183a12e1bc678da7e006e8143287247035f
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu May 21 14:55:43 2020 +0700
+
+    21-5
+
+commit db197a861ef7b49b31c3ef5ead391b530ad18674
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sun May 17 15:17:31 2020 +0700
+
+    Add user profile page
+
+commit 8e53ba59388b857f04ad77caf6a42fd489e6bc91
+Merge: f5c65b1 2aa00dd
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Fri May 15 10:11:35 2020 +0700
+
+    remove conflict
+
+commit f5c65b1070ea5d02a255a6512a06ef10ba4b953b
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Fri May 15 10:06:19 2020 +0700
+
+    Hompage 2.2.2
+
+commit 6737fc50675e42a7d8a4a555be2f1d47e189914c
+Merge: 3fbb99d 9c703d1
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Fri May 15 09:59:01 2020 +0700
+
+    Homepage 2.2.1
+
+commit 2aa00dd6604fd342b77bae30056a2139757a3cf7
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Fri May 15 09:56:55 2020 +0700
+
+    Delete .flutter-plugins-dependencies
+
+commit 3fbb99da507b5131d428820c4cade6e7d9d6f86b
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Fri May 15 09:54:00 2020 +0700
+
+    Homepage 2.2
+
+commit 38f925dab75e49de314a2239dc2a97ddaad10c3a
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Thu May 14 19:39:47 2020 +0700
+
+    Update .flutter-plugins-dependencies
+
+commit 73daf283b447a89c3c841be968e2a2ef5441b09a
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu May 14 19:31:22 2020 +0700
+
+    Homepage 2.2
+
+commit 4b691e8e6efb6107b4a6c6237806db92b694d518
+Merge: 9c703d1 4959957
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Thu May 14 16:29:18 2020 +0700
+
+    Merge pull request #14 from sangn2911/feature/onlinefeature
+    
+    Homepage 2.2
+
+commit 495995704650ca593f394021ba538cc1d4e183c3
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu May 14 16:28:08 2020 +0700
+
+    Homepage 2.2
+
+commit 9c703d1779791f4fb6f6bdcc1fa4636a04a9ec2c
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu May 14 15:34:26 2020 +0700
+
+    HomePage Update 2.1
+
+commit 5f7305599d5627e5342c88aed3e875eed89faca3
+Merge: 66c53f7 131ef79
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu May 14 15:26:28 2020 +0700
+
+    Merge branch 'dev' of https://github.com/sangn2911/MusicApp into dev
+
+commit 66c53f72e7323c57e262a5aea60e53772d05c07f
+Merge: a96816c 0deac33
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu May 14 15:15:05 2020 +0700
+
+    Merge branch 'feature/offlinefeature' into dev
+
+commit 0deac33e1d2bb5246eaeebb4fb05a60f3867b539
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu May 14 15:12:15 2020 +0700
+
+    Update HomePage 2
+
+commit 131ef79aee901db199ff0edee7b1bb485a68d009
+Merge: 8753361 2f7da8b
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Thu May 14 12:13:39 2020 +0700
+
+    Merge pull request #13 from sangn2911/feature/offlinefeature
+    
+    Feature/offlinefeature
+
+commit 2f7da8bfc64c5f1c705ec13eec6c37fcf0c8cf54
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu May 14 12:13:04 2020 +0700
+
+    Homepage Update
+
+commit 5500cf7a606e2ae5e292910a2a075d858b9d88aa
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Wed May 13 13:39:36 2020 +0700
+
+    Update Login and Sign Up
+
+commit a10a60a3b1abe1c4df9330fd04201848e27f0072
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Wed May 13 13:38:09 2020 +0700
+
+    12345
+
+commit 8753361b7747a9cd719b5a5bf60f8b2160b62043
+Merge: c1f87f6 6b5f679
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Tue May 12 17:30:20 2020 +0700
+
+    Merge pull request #12 from sangn2911/feature/offlinefeature
+    
+    Musis Player OK for NOW
+
+commit 6b5f6799ca6995fb9948c9e11e874c6ea8b1ee66
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Tue May 12 17:28:27 2020 +0700
+
+    Musis Player OK for NOW
+
+commit c1f87f6f9901ccfa12dffda5f8e441a8be04e71f
+Merge: a96816c cd50e9e
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Tue May 12 10:49:45 2020 +0700
+
+    Merge pull request #11 from sangn2911/feature/offlinefeature
+    
+    Feature/offlinefeature
+
+commit cd50e9e28f123bf81e638bd6b3e4641275a53b89
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Tue May 12 10:49:08 2020 +0700
+
+    Play music temporarily
+
+commit f69c2c04abecf1d3646fb6518df8643888821a0c
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Mon May 11 23:33:31 2020 +0700
+
+    Play Music ver1.3
+
+commit 2a55f5d654779b7b09f03c5da332ccf5326fa7f2
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Mon May 11 10:34:27 2020 +0700
+
+    Play music ver1.2
+
+commit 0e08100330626bc3dba5c0964063eda32e33bf6e
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sun May 10 21:00:47 2020 +0700
+
+    Play Music ver1.1
+
+commit 258d96b00198ecf2829bb98ab4fb525858791156
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sun May 10 19:57:31 2020 +0700
+
+    Play Music ver1
+
+commit bca31ebb37284976ae9ed4315d0e33a70e75e0d5
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sun May 10 09:03:20 2020 +0700
+
+    Read storage
+
+commit 97ea91e13a3e7261ded7778b65e0f905fa392ef4
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sun May 10 08:30:57 2020 +0700
+
+    Read storage
+
+commit a96816c7288cde3885be68c41efcc9672ea18cf3
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sat May 9 16:41:57 2020 +0700
+
+    first
+
+commit 464de56e428650fea32729ffa9c9ae43d578db13
+Merge: 2da501e 5b462a9
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sat May 9 16:34:04 2020 +0700
+
+    Merge branch 'feature/offline_feature' into dev
+
+commit 5b462a9b63852bef05085c26b30d51c3a42c1da9
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sat May 9 16:26:18 2020 +0700
+
+    3rd on feature
+
+commit 0665d2a0c75e47502859f02ac771a66bdbc161d2
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sat May 9 16:19:03 2020 +0700
+
+    2nd on feature
+
+commit 238db40beb1643eb261561a7978bd4148b31a0ac
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sat May 9 15:53:16 2020 +0700
+
+    1st on fearture
+
+commit 1eba1426af80cabfa83c621dda002708dff91bde
+Merge: d1e12fe 65c04e1
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Sat May 9 15:13:57 2020 +0700
+
+    Merge pull request #8 from sangn2911/test
+    
+    Nineth
+
+commit 65c04e143fef3a31c5c840f6da659156674a8dbf
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sat May 9 15:04:16 2020 +0700
+
+    Nineth
+
+commit d1e12fe99d0ccdc3381d78fdabbda4b7c82f1767
+Merge: 8e3ef0e 220272c
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Thu May 7 10:29:16 2020 +0700
+
+    Merge pull request #7 from sangn2911/test
+    
+    Eighth
+
+commit 220272cea51ba0947ef4bb0e7e49ad4362d3dcd4
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Thu May 7 10:22:12 2020 +0700
+
+    Eighth
+
+commit 8e3ef0e9c4c57b13e64e042cc9d6385e67b0f459
+Merge: e9ae331 3df20d0
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Wed May 6 15:58:40 2020 +0700
+
+    Merge pull request #6 from sangn2911/test
+    
+    Seventh
+
+commit 3df20d000e73a6685b317e8f164d76139fde8eff
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Wed May 6 15:56:32 2020 +0700
+
+    Seventh
+
+commit e9ae331000d188ba57686ca547e347d639b8bd4f
+Merge: b18c781 8746712
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Tue May 5 21:37:40 2020 +0700
+
+    Merge pull request #5 from sangn2911/test
+    
+    Test
+
+commit 8746712f96ae2d8258096be5675e8d9fa6302572
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Tue May 5 21:33:16 2020 +0700
+
+    Sixth
+
+commit 219325c518f362bb35d91f058a86c3576024f466
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Tue May 5 21:12:53 2020 +0700
+
+    Fifth
+
+commit b18c781e7592d79797aee68775bf26de17ce8458
+Merge: 02a769e 8e44b0f
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Tue May 5 20:02:28 2020 +0700
+
+    Merge pull request #3 from sangn2911/test
+    
+    Test
+
+commit 8e44b0f2bb3d4aface51007ac2b52cad149753ee
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Tue May 5 20:00:39 2020 +0700
+
+    Fourth
+
+commit becb8445fbe6b9b560565a9791d421f7ceb9a910
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sun May 3 17:50:54 2020 +0700
+
+    Third
+
+commit 02a769e23a90feddc5bbdd956b584afdf591c84d
+Merge: 71ecd75 72253dd
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Sun May 3 17:38:58 2020 +0700
+
+    Merge pull request #2 from sangn2911/test
+    
+    Second
+
+commit 72253dd258bf80d10c4a036d21cbd21e6979adf0
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sun May 3 17:25:18 2020 +0700
+
+    Second
+
+commit 71ecd75ea0eb32ad09182bf1ea1932e8c874d879
+Merge: 4d9b425 2da501e
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Sun May 3 16:15:07 2020 +0700
+
+    Merge pull request #1 from sangn2911/dev
+    
+    First Commit
+
+commit 2da501ec48533bea52b3e9c018e32213e268257f
+Author: RAITEI\Nguyen Quang Sang <sang.nguyen2911@hcmut.edu.vn>
+Date:   Sun May 3 16:14:20 2020 +0700
+
+    First Commit
+
+commit 4d9b4251baa2cf7c3f121878ff331cca6edb3a10
+Author: Nguyễn Quang Sang <61071137+sangn2911@users.noreply.github.com>
+Date:   Sun May 3 16:09:20 2020 +0700
+
+    Initial commit

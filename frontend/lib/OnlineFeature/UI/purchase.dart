@@ -4,12 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:MusicApp/Custom/color.dart';
 import 'package:MusicApp/OnlineFeature/httpService.dart';
-
-import 'package:MusicApp/Data/infoControllerBloC.dart';
+import 'package:MusicApp/BloC/userBloC.dart';
 
 class Purchase extends StatelessWidget {
 
-  final InfoControllerBloC userBloC;
+  final UserBloC userBloC;
   final String type;
   final BuildContext parentContext;
 

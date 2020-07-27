@@ -1,21 +1,22 @@
 import 'dart:ui';
 
+import 'package:MusicApp/BloC/globalBloC.dart';
+import 'package:MusicApp/BloC/userBloC.dart';
 import 'package:MusicApp/Custom/color.dart';
 import 'package:MusicApp/OnlineFeature/httpService.dart';
 import 'package:flutter/material.dart';
 import 'package:MusicApp/Custom/customIcons.dart';
 import 'package:flute_music_player/flute_music_player.dart';
 import 'package:MusicApp/Custom/sizeConfig.dart';
-//import 'package:provider/provider.dart';
-import 'package:MusicApp/Data/mainControlBloC.dart';
+import 'package:MusicApp/BloC/musicplayerBloC.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:MusicApp/Custom/customText.dart';
-import 'package:MusicApp/OnlineFeature/httpService.dart';
 
 
 class MusicPlayer extends StatefulWidget {
-  final MainControllerBloC _mp;
-  MusicPlayer(this._mp);
+
+  final GlobalBloC globalBloC;
+  MusicPlayer(this.globalBloC);
 
   @override
   MusicPlayerState createState() => MusicPlayerState();
@@ -23,8 +24,9 @@ class MusicPlayer extends StatefulWidget {
 
 class MusicPlayerState extends State<MusicPlayer> {
 
-//Temp--------------------------------
-
+//BloC--------------------------------
+  UserBloC userBloC;
+  MusicPlayerBloC mpBloC;
 
 // Button play
   Icon iconPlay = Icon(
@@ -38,22 +40,18 @@ class MusicPlayerState extends State<MusicPlayer> {
   );
 
   Widget dropDownButton (){
-    return Container(
-      // decoration: BoxDecoration(
-      //   border: Border.all(color: Colors.black),
-      //   shape: BoxShape.circle,
-      // ),
-      child: Icon(
-        Icons.keyboard_arrow_down,
-        color: Colors.white,
-        size: 40,
-      ),
+    return Icon(
+      Icons.arrow_drop_down,
+      color: Colors.white,
+      size: 40,
     );
   }
 
   @override
   void initState() {
     super.initState();
+    userBloC = widget.globalBloC.userBloC;
+    mpBloC = widget.globalBloC.mpBloC;
   }
 
   @override
@@ -77,6 +75,7 @@ class MusicPlayerState extends State<MusicPlayer> {
           backgroundColor: Colors.black,
           centerTitle: true,
           leading: IconButton(
+            padding: EdgeInsets.zero,
             icon: dropDownButton(),
             onPressed: (){
               Navigator.pop(context);
@@ -84,31 +83,18 @@ class MusicPlayerState extends State<MusicPlayer> {
           ),
           title: TextLato("Music Player", Colors.white, 25, FontWeight.w700),
           actions: <Widget>[
-            StreamBuilder(
-              stream: widget._mp.fromDB,
-              builder: (BuildContext context, AsyncSnapshot snapshot){
-                if (!snapshot.hasData){
-                  return Icon(
-                    Icons.phone_android,
-                    color: Colors.white,
-                    size: 20.0,
-                  );
-                }
-                bool isOnline = snapshot.data;
-                
-                return isOnline ? Icon(
-                  Icons.wifi,
-                  color: Colors.white,
-                  size: 30.0,
-                ) 
-                : Icon(
-                    Icons.phone_android,
-                    color: Colors.white,
-                    size: 27.0,
-                ); 
+            IconButton(
+              padding: EdgeInsets.zero,
+              iconSize: 30,
+              icon: Icon(
+                Icons.format_list_bulleted,
+                color: Colors.white,
+              ), 
+              onPressed: (){
+                currentPlaylist(context);
               }
             ),
-            SizedBox(width: 12),
+            //SizedBox(width: 9),
           ],
         ),
         body: body()
@@ -117,18 +103,17 @@ class MusicPlayerState extends State<MusicPlayer> {
   }
 
   Widget body(){
-    final MainControllerBloC mp = widget._mp;
     return Center(
       child: Column(
           children: <Widget>[
             SizedBox(height: SizeConfig.screenHeight*28/640),
             imageDecoration(),
-            //albumArtCover(mp),
+            //albumArtCover(),
             SizedBox(height: SizeConfig.screenHeight*28/640),
-            songInfo(mp),
+            songInfo(),
             SizedBox(height: SizeConfig.screenHeight*20/640),
             favoritePlayListButton(),
-            musicControl(mp),
+            musicControl(),
           ],
         ),
     );
@@ -142,12 +127,10 @@ class MusicPlayerState extends State<MusicPlayer> {
     );
   }
 
-  Widget albumArtCover(MainControllerBloC mp){
-    // final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
-    // final MainControllerBloC mp = widget._mp;
+  Widget albumArtCover(){
     return Container(
       child: StreamBuilder<Song>(
-        stream: mp.currentSong,
+        stream: mpBloC.currentSong,
         builder: (BuildContext context, AsyncSnapshot<Song> snapshot){
           if (!snapshot.hasData || snapshot.data.albumArt == null){
             return  imageDecoration();
@@ -169,13 +152,11 @@ class MusicPlayerState extends State<MusicPlayer> {
     );
   }
 
-  Widget songInfo(MainControllerBloC mp){
-    //final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
-    // final MainControllerBloC mp = widget._mp;
+  Widget songInfo(){
     return Container(
       padding: EdgeInsets.only(left: 50, right: 50),
       child: StreamBuilder<Song>(
-        stream: mp.currentSong,
+        stream: mpBloC.currentSong,
         builder: (BuildContext context, AsyncSnapshot<Song> snapshot){
           if (!snapshot.hasData){
             return Container();
@@ -216,9 +197,9 @@ class MusicPlayerState extends State<MusicPlayer> {
             size: 25,
           ), 
           onPressed: (){
-            widget._mp.infoBloC.fetchPlaylists("Tri");
-            widget._mp.fromDB.value
-              ? addPlayList(context, widget._mp)
+            userBloC.fetchPlaylists("Tri");
+            mpBloC.fromDB.value
+              ? addPlayList(context)
               : createAlertDialog("Offline playlist is not supported", context);
           }
         ),
@@ -226,22 +207,20 @@ class MusicPlayerState extends State<MusicPlayer> {
     );
   }
 
-  Widget musicControl(MainControllerBloC mp){
+  Widget musicControl(){
     return Column(
       children: <Widget>[
-        musicSlider(mp),
-        controlButton(mp),
+        musicSlider(),
+        controlButton(),
       ],
     );
   }
 
-  Widget musicSlider(MainControllerBloC mp){
-    // final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
-    // final MainControllerBloC mp = widget._mp;
+  Widget musicSlider(){
     return Container(
       width: 360,
       child: StreamBuilder<MapEntry<Duration,Song>>(
-        stream: CombineLatestStream.combine2(mp.position, mp.currentSong, (a,b) => MapEntry(a,b)),
+        stream: CombineLatestStream.combine2(mpBloC.position, mpBloC.currentSong, (a,b) => MapEntry(a,b)),
         builder: (BuildContext context, AsyncSnapshot<MapEntry<Duration,Song>> snapshot){
           if (!snapshot.hasData){
             return Slider(value: 0, onChanged: null, activeColor: Colors.white,);
@@ -252,12 +231,12 @@ class MusicPlayerState extends State<MusicPlayer> {
 
           final Duration dataPos = snapshot.data.key;
           final int positioninMilliseconds = dataPos?.inMilliseconds;
-          //final Song currentSong = snapshot.data.value;
+
           Duration duration;
           int durationinMilliseconds = 0;
           try {
-            durationinMilliseconds = mp.duration.inMilliseconds;
-            duration = mp.duration;
+            durationinMilliseconds = mpBloC.duration.inMilliseconds;
+            duration = mpBloC.duration;
           } catch(e) {
             duration = Duration(seconds: 0);
           }
@@ -273,10 +252,10 @@ class MusicPlayerState extends State<MusicPlayer> {
                   final Duration newPos = Duration(
                     milliseconds: value.toInt(),
                   );
-                  mp.updatePosition(newPos);
+                  mpBloC.updatePosition(newPos);
                 },
                 onChangeEnd: (double value) {
-                  mp.audioSeek(value / 1000);
+                  mpBloC.audioSeek(value / 1000);
                 },
                 activeColor: Colors.white,
               ),
@@ -295,17 +274,14 @@ class MusicPlayerState extends State<MusicPlayer> {
     );
   }
 
-  Widget controlButton(MainControllerBloC mp){
-    //final MainControllerBloC mp = Provider.of<MainControllerBloC>(context);
-    //final MainControllerBloC mp = widget._mp;
+  Widget controlButton(){
     return Container(
       child: StreamBuilder<MapEntry<MapEntry<PlayerState,PlayerMode>,Song>>(
-        stream: CombineLatestStream.combine3(mp.playerState, mp.playerMode,mp.currentSong, (a,b, c) => MapEntry(MapEntry(a,b),c)),
+        stream: CombineLatestStream.combine3(mpBloC.playerState, mpBloC.playerMode,mpBloC.currentSong, (a,b, c) => MapEntry(MapEntry(a,b),c)),
         builder: (BuildContext context, AsyncSnapshot<MapEntry<MapEntry<PlayerState,PlayerMode>,Song>> snapshot){
           if (!snapshot.hasData){
             return Container();
           }
-
           final Song currentSong = snapshot.data.value;
           final PlayerState playerState = snapshot.data.key.key;
           final PlayerMode playerMode = snapshot.data.key.value;
@@ -321,7 +297,7 @@ class MusicPlayerState extends State<MusicPlayer> {
                     : Colors.white,
                 ), 
                 onPressed: (){
-                  mp.playMode(2);
+                  mpBloC.playMode(2);
                 }
               ),
               SizedBox(width: 10),
@@ -332,7 +308,7 @@ class MusicPlayerState extends State<MusicPlayer> {
                   Icons.skip_previous,
                   color: Colors.grey,
                 ),
-                onPressed: () => mp.prev()
+                onPressed: () => mpBloC.prev()
               ),
   // Button "Pause/Play"
               IconButton(
@@ -342,10 +318,10 @@ class MusicPlayerState extends State<MusicPlayer> {
                   : iconPlay,
                 onPressed: (playerState != PlayerState.paused) 
                   ? () {
-                    mp.pause();
+                    mpBloC.pause();
                   }
                   : () {
-                    mp.playSong(currentSong);
+                    mpBloC.play();
                     }
                 ),
   // Button "Next Music"
@@ -355,7 +331,7 @@ class MusicPlayerState extends State<MusicPlayer> {
                   Icons.skip_next,
                   color: Colors.grey,
                 ),
-                onPressed: () => mp.next()
+                onPressed: () => mpBloC.next()
                 ),
               SizedBox(width: 10),
   // Button "repeat"
@@ -369,7 +345,7 @@ class MusicPlayerState extends State<MusicPlayer> {
                 ), 
                 onPressed: (){
                   setState(() {
-                    mp.playMode(1);
+                    mpBloC.playMode(1);
                   });
                 }
               ),
@@ -393,7 +369,8 @@ class MusicPlayerState extends State<MusicPlayer> {
     );
   }
 
-  Future<String> addPlayList(BuildContext context, MainControllerBloC mp){
+//Add song to playlist
+  Future<String> addPlayList(BuildContext context){
     return showDialog(
       context: context, 
       builder: (context){
@@ -415,7 +392,7 @@ class MusicPlayerState extends State<MusicPlayer> {
                 SizedBox(height: 10),
                 Expanded(
                   child: StreamBuilder(
-                    stream: widget._mp.infoBloC.playlists,
+                    stream: userBloC.playlists,
                     builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot){
                       if (!snapshot.hasData){
                         return Center(
@@ -426,7 +403,6 @@ class MusicPlayerState extends State<MusicPlayer> {
                         );
                       }
                       List<String> playlists = snapshot.data;
-                      //print(playlists);
                       if (playlists.length == 0){
                         return noPlaylist();
                       }
@@ -465,13 +441,17 @@ class MusicPlayerState extends State<MusicPlayer> {
       ),
       title: TextLato(playlist, Colors.white, 22, FontWeight.w700),
       onTap: () async{
-        print( widget._mp.currentSong.value.title);
-        int result = await playlistAdd(playlist,"Tri", widget._mp.currentSong.value.title);
+
+        int result = await playlistAdd(playlist,"Tri", mpBloC.currentSong.value.iD);
         if (result == 1){
           createAlertDialog("Add to $playlist successfully", context);
-        } else
+        } 
+        else if (result == 2){
+          createAlertDialog("Duplicate Name", context);
+        }
+        else
           createAlertDialog("Failed to add to $playlist", context);
-        print("Add to $playlist");
+        //print("Add to $playlist");
       },
     );
   }
@@ -479,6 +459,89 @@ class MusicPlayerState extends State<MusicPlayer> {
   Widget noPlaylist(){
     return Center(
       child: TextLato("No playlist found.", Colors.white, 19, FontWeight.w500)
+    );
+  }
+
+//Current song list 
+  Future<String> currentPlaylist(BuildContext context){
+    return showDialog(
+      context: context, 
+      builder: (context){
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+          child: Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(50),
+                topRight: Radius.circular(50),
+              )
+            ),
+            insetPadding: EdgeInsets.only(left: 50, right: 50, top: 80, bottom: 80),
+            backgroundColor: ColorCustom.grey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextLato("Current Playing", ColorCustom.orange, 25, FontWeight.w500),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Expanded(
+                  child: StreamBuilder(
+                    stream: mpBloC.currentPlaying,
+                    builder: (BuildContext context, AsyncSnapshot<MapEntry<List<Song>, List<Song>>> snapshot){
+                      if (!snapshot.hasData){
+                        return Center(
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.black,
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          ),
+                        );
+                      }
+                      List<Song> songlist = snapshot.data.key;
+                      return songList(context, songlist);
+                    }
+                  ),
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
+          ),
+        );
+      }
+    );
+  }
+
+  Widget songList(BuildContext context, List<Song> songlist){
+    return ListView.builder(
+      physics: BouncingScrollPhysics(),
+      itemCount: songlist.length,
+      itemBuilder: (BuildContext context, int index){
+        Song song = songlist[index];
+        return songTile(song, songlist);
+        },                                     
+    );
+  }
+
+
+  Widget songTile(Song song, List<Song> songlist){
+    return ListTile(
+      contentPadding: EdgeInsets.only(left: 20),
+      leading: Icon(
+        Icons.library_music,
+        color: ColorCustom.orange,
+        size: 50,
+      ),
+      title: TextLato(song.title, Colors.white, 22, FontWeight.w700),
+      subtitle: TextLato(song.artist, Colors.grey, 15, FontWeight.w500),
+      onTap: () {
+        mpBloC.updatePlaylist(songlist);
+        mpBloC.stop();
+        mpBloC.handleSong(song);
+      },
     );
   }
 

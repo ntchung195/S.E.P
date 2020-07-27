@@ -218,7 +218,6 @@ def home():
             return listsong.fetchPlaylist(result ,db)
         if type == 'deletePlaylist':
             return listsong.delPlaylist(result,db)
-
             
     return 'OK'
     

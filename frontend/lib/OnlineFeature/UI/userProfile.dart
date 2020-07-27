@@ -1,12 +1,13 @@
 import 'dart:io';
-import 'dart:typed_data';
+// import 'dart:typed_data';
 import 'dart:ui';
-import 'package:MusicApp/Data/infoControllerBloC.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:MusicApp/BloC/globalBloC.dart';
+import 'package:MusicApp/BloC/userBloC.dart';
+// import 'package:flutter/services.dart' show rootBundle;
 import 'package:MusicApp/Custom/customText.dart';
 import 'package:MusicApp/Custom/sizeConfig.dart';
-import 'package:MusicApp/Data/mainControlBloC.dart';
-import 'package:MusicApp/Data/recoderBloC.dart';
+import 'package:MusicApp/BloC/musicplayerBloC.dart';
+import 'package:MusicApp/BloC/recoderBloC.dart';
 import 'package:MusicApp/Data/userModel.dart';
 import 'package:MusicApp/OnlineFeature/UI/purchase.dart';
 import 'package:MusicApp/OnlineFeature/httpService.dart';
@@ -18,8 +19,8 @@ import 'package:flutter_audio_recorder/flutter_audio_recorder.dart';
 
 class UserProfile extends StatefulWidget {
 
-  final MainControllerBloC mainBloC;
-  UserProfile(this.mainBloC);
+  final GlobalBloC globalBloC;
+  UserProfile(this.globalBloC);
 
 
   @override
@@ -29,14 +30,15 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> {
 
   UserModel userInfo;
-  InfoControllerBloC infoBloC;
+  UserBloC userBloC;
   RecorderBloC recordBloC;
 
   @override
   void initState() {
     super.initState();
     recordBloC = RecorderBloC();
-    userInfo = widget.mainBloC.infoBloC.userInfo.value;
+    userBloC = widget.globalBloC.userBloC;
+    userInfo = userBloC.userInfo.value;
   }
 
   @override
@@ -75,7 +77,7 @@ class _UserProfileState extends State<UserProfile> {
           Navigator.pop(context);
         }
       ),
-      title: text("Profile"),
+      title: TextLato("Profile", Colors.white, 20, FontWeight.w400),
       actions: <Widget>[
         IconButton(
             onPressed: (){},
@@ -105,23 +107,25 @@ class _UserProfileState extends State<UserProfile> {
           SizedBox(width: 70),
           Column(
             children: <Widget>[
-              text("${userInfo.name}"),
-              SizedBox(height: 15,),
+              SizedBox(height: 10),
+              TextLato("${userInfo.name}", Colors.white, 20, FontWeight.w600),
+              SizedBox(height: 10,),
               Container(
-                width: 100,
-                height: 50,
                 decoration: BoxDecoration(
-                  border: Border.all(color: ColorCustom.orange),
+                  border: Border.all(color: ColorCustom.orange, width: 5),
                 ),
-                child: Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
                   child: InkWell(
-                    child: text("VIP",color: userInfo.isVip == 1 ? Colors.amber : Colors.white, size: userInfo.isVip == 1 ? 40 : 20, fontWeight: userInfo.isVip == 1 ? FontWeight.w900 : FontWeight.w400),
+                    child: userInfo.isVip == 1
+                      ? TextLato("VIP", Colors.amber, 40, FontWeight.w900)
+                      : TextLato("VIP", Colors.white, 20, FontWeight.w400),
                     onTap: (){
                       showDialog(
                         context: context,
                         builder: (context) {
                           return Dialog(
-                            child: Purchase(userBloC: widget.mainBloC.infoBloC, type: "status",),
+                            child: Purchase(userBloC: userBloC, type: "status",),
                           );
                         }
                       );
@@ -153,7 +157,7 @@ class _UserProfileState extends State<UserProfile> {
 
   Widget childList(BuildContext context){
     return StreamBuilder(
-      stream: widget.mainBloC.infoBloC.userInfo,
+      stream: userBloC.userInfo,
       builder: (BuildContext context, AsyncSnapshot snapshot){
         if (!snapshot.hasData) 
           return Center(
@@ -168,15 +172,14 @@ class _UserProfileState extends State<UserProfile> {
           children: <Widget>[
             infoListTitle(Icons.mail , "${_userInfo.email}", onPressed: (){
               createPopUp(context, "Enter new email", () async { 
-                //print("email");
-                int result = await updateInfo(widget.mainBloC.infoBloC.userInfo , customController.text.toString(), _userInfo.name, "updateEmail");
+                int result = await updateInfo(userBloC , customController.text.toString(), _userInfo.name, "updateEmail");
                 customController.text = "";
                 result == 1 ? createAlertDialog("Update Successfully", context) : createAlertDialog("Check Your Info", context);
               });
             }),
             infoListTitle(Icons.phone, "${_userInfo.phone}", onPressed: (){
               createPopUp(context, "Enter new phone number", () async { 
-                int result = await updateInfo(widget.mainBloC.infoBloC.userInfo , customController.text.toString(), _userInfo.name, "updatePhone");
+                int result = await updateInfo(userBloC , customController.text.toString(), _userInfo.name, "updatePhone");
                 customController.text = "";
                 result == 1 ? createAlertDialog("Update Successfully", context) : createAlertDialog("Check Your Info", context);
               });
@@ -186,7 +189,7 @@ class _UserProfileState extends State<UserProfile> {
                 context: context,
                 builder: (context) {
                   return Dialog(
-                    child: Purchase(userBloC: widget.mainBloC.infoBloC, type: "buycoin"),
+                    child: Purchase(userBloC: userBloC, type: "buycoin"),
                   );
                 }
               );
@@ -195,10 +198,10 @@ class _UserProfileState extends State<UserProfile> {
 
               int result = await prepareVoice(_userInfo.name, _userInfo.id); //Voice Request
 
-              //if (result == 0)
-              createVoiceRegister(context, "Voice Register");
-              // else if (result == 3) createAlertDialog("Already register voice recognition", context);
-              // else createAlertDialog("Something's wrong", context);
+              if (result == 0)
+                createVoiceRegister(context, "Voice Register");
+              else if (result == 3) createAlertDialog("Already register voice recognition", context);
+              else createAlertDialog("Something's wrong", context);
 
             }),
             infoListTitle(Icons.exit_to_app,"Log Out", onPressed: () async {
@@ -225,7 +228,7 @@ class _UserProfileState extends State<UserProfile> {
         size: 50,
         color: Colors.amber,
       ),
-      title: text(str, size: 25),
+      title: TextLato(str, Colors.white , 20, FontWeight.w400),
       trailing: IconButton(
           onPressed: onPressed,
           icon: Icon(
@@ -335,20 +338,17 @@ class _UserProfileState extends State<UserProfile> {
                             child: TextLato("Finish", ColorCustom.orange, 25, FontWeight.w700),
                             onTap: () async{
                               if (recordBloC.currentFile != null){
-                                print("File Path: ${recordBloC.currentFile.path}");
+                                // print("File Path: ${recordBloC.currentFile.path}");
                                 File file = recordBloC.currentFile;
                                 int result = 5;
-                                print("count: $count");
                                 if (count == 5)
                                   result = await voiceAuthentication(count, userInfo.name, userInfo.id, "register", file);
                                 else {
                                   await voiceAuthentication(count, userInfo.name, userInfo.id, "register", file);
                                 }
-                                
                                 setState(() {
                                   count += 1;
                                 });
-
                                 if (result == 0) createAlertDialog("Success", context);
                                 else createAlertDialog("Again", context);
                               }
@@ -442,18 +442,6 @@ class _UserProfileState extends State<UserProfile> {
           ],
         );
     }
-  }
-
-  Widget text(String str, {Color color = Colors.white, double size = 20.0, FontWeight fontWeight = FontWeight.w400}){
-    return Text(
-      str,
-      style: TextStyle(
-        color: color,
-        fontSize: 20.0,
-        fontFamily: 'Lato',
-        fontWeight: fontWeight,
-      ),
-    );
   }
 
 }
