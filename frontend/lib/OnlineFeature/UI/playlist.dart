@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:MusicApp/BloC/globalBloC.dart';
 import 'package:MusicApp/BloC/musicplayerBloC.dart';
 import 'package:MusicApp/BloC/userBloC.dart';
-import 'package:MusicApp/Data/songModel.dart';
 import 'package:MusicApp/Feature/currentPlaying.dart';
 import 'package:MusicApp/Feature/musicPlayer.dart';
 import 'package:MusicApp/OnlineFeature/httpService.dart';
@@ -12,8 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:MusicApp/Custom/color.dart';
 
 import 'package:MusicApp/Custom/customText.dart';
-
-
 
 class Playlists extends StatefulWidget {
 
@@ -269,7 +266,6 @@ class _PlaylistsState extends State<Playlists> {
   final TextEditingController customController = TextEditingController(text: "");
 
   Future<String> createPlaylistPopUp(BuildContext context){
-    BuildContext gcontext = context;
     return showDialog(
       context: context, 
       builder: (context) {
@@ -293,10 +289,10 @@ class _PlaylistsState extends State<Playlists> {
                   borderSide: BorderSide(color: Colors.black)
                 ),
                 border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black)
+                  borderSide: BorderSide(color: Colors.white)
                 ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black)
+                  borderSide: BorderSide(color: Colors.white)
                 )
               ),
             ),
@@ -307,11 +303,13 @@ class _PlaylistsState extends State<Playlists> {
                 onPressed: () async {
                   print("Username: ${userBloC.userInfo.value.name}");
                   List<String> playlists = await createPlaylist(customController.text, userBloC.userInfo.value.name);
-                  if (playlists[0] == "") createAlertDialog("Duplicated", gcontext);
+                  if (playlists[0] == "") createAlertDialog("Playlist Exists", context);
                   else if (playlists == null) createAlertDialog("Server Error", context);
-                  else
+                  else {
                     userBloC.playlists.add(playlists);
-                  Navigator.pop(context);
+                    Navigator.pop(context);
+                    createAlertDialog("Playlist ${customController.text} created", context);
+                  }
                 },
               ),
               MaterialButton(
@@ -341,7 +339,7 @@ class _PlaylistsState extends State<Playlists> {
             PopupMenuItem<int>(
               value: 1,
               child: Text(
-                "Open",
+                "Play",
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Lato',

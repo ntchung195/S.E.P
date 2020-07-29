@@ -9,7 +9,6 @@ import 'package:MusicApp/Custom/customText.dart';
 import 'package:MusicApp/BloC/recoderBloC.dart';
 import 'package:MusicApp/Data/userModel.dart';
 import 'package:MusicApp/myMusic.dart';
-
 import 'package:MusicApp/Custom/sizeConfig.dart';
 import 'package:MusicApp/Custom/color.dart';
 import 'package:MusicApp/Custom/customIcons.dart';
@@ -17,8 +16,8 @@ import 'package:MusicApp/OnlineFeature/UI/signUp.dart';
 import 'package:MusicApp/OnlineFeature/httpService.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter_audio_recorder/flutter_audio_recorder.dart';
-import 'package:marquee/marquee.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 class Login extends StatefulWidget {
   @override
@@ -26,6 +25,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+
   final TextEditingController usernameInput = TextEditingController();
   final TextEditingController passwordInput = TextEditingController();
   RecorderBloC recordBloC = RecorderBloC();
@@ -42,7 +42,6 @@ class _LoginState extends State<Login> {
     List<String> localSave = _prefs.getStringList("username") ?? [];
     for (var user in localSave){
       _userList.add(json.decode(user));
-
     }
   }
 
@@ -162,12 +161,17 @@ class _LoginState extends State<Login> {
     );
   }
 
+  int count = 0;
+
+
   Widget signInWithVoiceButton(BuildContext context){
     return IconButton(
         onPressed: () {
           // int result = await  prepareVerify("username", "id");
           // print("$result");
-          createVoiceVerify(context);
+          if (count < 3)
+            createVoiceVerify(context);
+          else createAlertDialog("Please login with password", context);
         },
         iconSize: 35,
         icon: Icon(
@@ -218,24 +222,36 @@ class _LoginState extends State<Login> {
           final password = passwordInput.text.trimRight();
 
           UserModel userInfo;
-          if (username == "1@1")
+          int code;
+          if (username == "_")
             userInfo = UserModel(
               id: "5eb4048961f2042d286fd175",
-              name: "Sang",
-              email: "Sangn@gmail.com",
-              phone: "12345", 
-              coin: 10000,
-              isVip: 0
+              name: "_",
+              email: "example@gmail.com",
+              phone: "00000",
+              coin: 100000,
+              isVip: 1
             );
+          else if (username == "" || password == ""){
+            createAlertDialog("Do not leave username \nor password empty",context);
+            return;
+          }
           else {
-            userInfo = await verifyUser(username, password);
+            var response = await verifyUser(username, password);
+            userInfo = response.key;
+            code = response.value;
           }
 
-          if (userInfo == null)
+          if (code == USER_NOT_EXIST)
             createAlertDialog("Check your info",context);
+          else if (code == CODE_TIMEOUT){
+            createAlertDialog("Time out",context);
+          }
           else {
+            setState(() {
+              count = 0;
+            });
             saveLocal(userInfo);
-
             createAlertDialog("Sign In Successfully",context)
               .then((value) =>
                 Navigator.push(
@@ -245,7 +261,7 @@ class _LoginState extends State<Login> {
                   )
                 )
               );
-          }
+            }
         }),
         
         shape: RoundedRectangleBorder(
@@ -395,16 +411,16 @@ class _LoginState extends State<Login> {
                           InkWell(
                             child: TextLato("Finish", ColorCustom.orange, 25, FontWeight.w700),
                             onTap: () async {
-
                               print("File Path: ${recordBloC.currentFile.path}");
                               File file = recordBloC.currentFile;
                               int result = await voiceAuthentication(0,_userList[index]["name"],_userList[index]["id"],"recognize",file);
-
-                              //int result = await voiceAuthentication(0,"Martin Scorsese","5eb4048961f2042d286fd175","recognize",file);
-
-                              // int result = 2;
+                              setState(() {
+                                count += 1;
+                              });
                               if (result == 0){
-                                print("Successfully");
+                                setState(() {
+                                  count = 0;
+                                });
                                 UserModel userInfo = await getUserInfo(_userList[index]["name"]);
                                 createAlertDialog("Sign In Successfully",context)
                                   .then((value) =>
@@ -417,13 +433,12 @@ class _LoginState extends State<Login> {
                                   );
                               }
                               if (result == 2){
-                                print("Fail to recognize");
+                                if (count == 3) Navigator.pop(context);
                                 createAlertDialog("Fail to recognize",context);
                               }
                             },
                           ),
                           SizedBox(height: 15),
-  
                         ],
                       ),
                     );
@@ -486,8 +501,7 @@ class _LoginState extends State<Login> {
             SizedBox(height: 25),
             TextLato("Ready", Colors.white, 25, FontWeight.w700)
           ],
-        );         
-
+        );
       default:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -513,4 +527,6 @@ class _LoginState extends State<Login> {
         );
     }
   }
+
+
 }

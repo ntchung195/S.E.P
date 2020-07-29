@@ -197,10 +197,10 @@ class MusicPlayerState extends State<MusicPlayer> {
             size: 25,
           ), 
           onPressed: (){
-            userBloC.fetchPlaylists("Tri");
+            userBloC.fetchPlaylists(userBloC.userInfo.value.name);
             mpBloC.fromDB.value
               ? addPlayList(context)
-              : createAlertDialog("Offline playlist is not supported", context);
+              : createAlertDialog("Offline playlist is \nnot supported", context);
           }
         ),
       ]
@@ -276,15 +276,15 @@ class MusicPlayerState extends State<MusicPlayer> {
 
   Widget controlButton(){
     return Container(
-      child: StreamBuilder<MapEntry<MapEntry<PlayerState,PlayerMode>,Song>>(
-        stream: CombineLatestStream.combine3(mpBloC.playerState, mpBloC.playerMode,mpBloC.currentSong, (a,b, c) => MapEntry(MapEntry(a,b),c)),
-        builder: (BuildContext context, AsyncSnapshot<MapEntry<MapEntry<PlayerState,PlayerMode>,Song>> snapshot){
+      child: StreamBuilder<MapEntry<PlayerState,PlayerMode>>(
+        stream: CombineLatestStream.combine2(mpBloC.playerState, mpBloC.playerMode, (a,b) => MapEntry(a,b)),
+        builder: (BuildContext context, AsyncSnapshot<MapEntry<PlayerState,PlayerMode>> snapshot){
           if (!snapshot.hasData){
             return Container();
           }
-          final Song currentSong = snapshot.data.value;
-          final PlayerState playerState = snapshot.data.key.key;
-          final PlayerMode playerMode = snapshot.data.key.value;
+          final PlayerState playerState = snapshot.data.key;
+          final PlayerMode playerMode = snapshot.data.value;
+          print("playerState: $playerState");
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -313,16 +313,14 @@ class MusicPlayerState extends State<MusicPlayer> {
   // Button "Pause/Play"
               IconButton(
                 iconSize: 68.0,
-                icon: (playerState != PlayerState.paused) 
-                  ? iconPause 
+                icon: (playerState != PlayerState.paused)
+                  ? iconPause
                   : iconPlay,
-                onPressed: (playerState != PlayerState.paused) 
-                  ? () {
-                    mpBloC.pause();
+                onPressed: () {
+                    if (playerState == PlayerState.playing) mpBloC.pause();
+                    else if (playerState == PlayerState.paused) mpBloC.play();
+                    else return;
                   }
-                  : () {
-                    mpBloC.play();
-                    }
                 ),
   // Button "Next Music"
               IconButton(
@@ -386,7 +384,7 @@ class MusicPlayerState extends State<MusicPlayer> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    TextLato("Choose playlist", ColorCustom.orange, 25, FontWeight.w500),
+                    TextLato("Choose playlist to add", ColorCustom.orange, 25, FontWeight.w500),
                   ],
                 ),
                 SizedBox(height: 10),
@@ -441,13 +439,13 @@ class MusicPlayerState extends State<MusicPlayer> {
       ),
       title: TextLato(playlist, Colors.white, 22, FontWeight.w700),
       onTap: () async{
-
-        int result = await playlistAdd(playlist,"Tri", mpBloC.currentSong.value.iD);
+        int result = await playlistAdd(playlist, userBloC.userInfo.value.name, mpBloC.currentSong.value.iD);
         if (result == 1){
+          Navigator.pop(context);
           createAlertDialog("Add to $playlist successfully", context);
         } 
         else if (result == 2){
-          createAlertDialog("Duplicate Name", context);
+          createAlertDialog("Song Exists", context);
         }
         else
           createAlertDialog("Failed to add to $playlist", context);

@@ -133,6 +133,10 @@ class SignUp extends StatelessWidget {
           if (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile) {
             final email = emailInput.text.trim();
             final username = usernameInput.text.trim();
+            if (username == "_") {
+              createAlertDialog("Please change your username", context);
+              return;
+            }
             final password = passwordInput.text.trim();
             if (password != passwordInput2.text.trim())
               createAlertDialog("Check confirm password again",context);

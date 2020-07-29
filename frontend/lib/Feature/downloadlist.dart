@@ -1,6 +1,5 @@
 import 'package:MusicApp/BloC/globalBloC.dart';
 import 'package:MusicApp/Custom/color.dart';
-import 'package:MusicApp/Custom/customIcons.dart';
 import 'package:MusicApp/BloC/musicplayerBloC.dart';
 import 'package:MusicApp/Feature/currentPlaying.dart';
 import 'package:MusicApp/Feature/musicPlayer.dart';
@@ -16,12 +15,10 @@ class Downloadlist extends StatefulWidget {
   Downloadlist(this._isOnline);
 
   @override
-  _DownloadlistState createState() => _DownloadlistState();
+  DownloadlistState createState() => DownloadlistState();
 }
 
-class _DownloadlistState extends State<Downloadlist> {
-
-  //PanelController _panelController;
+class DownloadlistState extends State<Downloadlist> {
 
   List<dynamic> _filterList = List();
   List<dynamic> _songList = List();
@@ -31,7 +28,6 @@ class _DownloadlistState extends State<Downloadlist> {
 
   @override
   void initState() {
-    //_panelController = PanelController();
     super.initState();
   }
 
@@ -79,7 +75,6 @@ class _DownloadlistState extends State<Downloadlist> {
 
   Widget offlineHandle(){
     final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
-    final MusicPlayerBloC mp = globalBloC.mpBloC;
     return isUsed
     ? GestureDetector(
         onTap: (){
@@ -98,7 +93,7 @@ class _DownloadlistState extends State<Downloadlist> {
 
   Widget userButton(BuildContext context){
     final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
-    final MusicPlayerBloC mp = globalBloC.mpBloC;
+    //final MusicPlayerBloC mp = globalBloC.mpBloC;
     return IconButton(
       iconSize: 30,
       icon: Container(
@@ -143,9 +138,9 @@ class _DownloadlistState extends State<Downloadlist> {
         ),
       ),
 
-      actions: <Widget>[
-        IconButton(icon: Icon(IconCustom.settings_1), onPressed: (){}),
-      ],
+      // actions: <Widget>[
+      //   IconButton(icon: Icon(IconCustom.settings_1), onPressed: (){}),
+      // ],
     );
   }
 
@@ -367,7 +362,7 @@ class _DownloadlistState extends State<Downloadlist> {
         ),
       ),
       //trailing: moreSetting(),
-      onTap: () {                                                         //Function for song cards
+      onTap: () {
         setState(() {
           isUsed = true;
         });
@@ -375,6 +370,7 @@ class _DownloadlistState extends State<Downloadlist> {
         mpBloC.updatePlaylist(songList);
         mpBloC.stop();
         mpBloC.handleSong(song);
+        
       },
     );
   }

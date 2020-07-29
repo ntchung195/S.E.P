@@ -57,8 +57,6 @@ class _SearchPageState extends State<SearchPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(height: 10,),
-        //allTagColumn(),
-        //emptySearch(),
         searchList(),
         StreamBuilder<bool>(
           stream: mpBloC.isUsed,
@@ -138,104 +136,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget allTagColumn(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(height: 10,),
-        TextLato("Top Gernes", Colors.white, 20, FontWeight.w400),
-        SizedBox(height: 15,),
-        
-        Row(
-          children: <Widget>[
-            tagMusic("Pop", ColorCustom.brown, Icons.album),
-            SizedBox(width: 10,),
-            tagMusic("KPop", ColorCustom.lightBlue, Icons.album)
-          ],
-        ),
-        SizedBox(height: 10,),
-
-        Row(
-          children: <Widget>[
-            tagMusic("EDM", ColorCustom.mediumYellow, Icons.album),
-            SizedBox(width: 10,),
-            tagMusic("Rock", ColorCustom.deepRed, Icons.album)
-          ],
-        ),
-        SizedBox(height: 16,),
-
-        TextLato("Others", Colors.white, 20, FontWeight.w400),
-        SizedBox(height: 15,),
-
-        Row(
-          children: <Widget>[
-            tagMusic("JPop", ColorCustom.lightPink, Icons.album),
-            SizedBox(width: 10,),
-            tagMusic("Jax", ColorCustom.lightBrown, Icons.album)
-          ],
-        ),
-        SizedBox(height: 10,),
-
-        Row(
-          children: <Widget>[
-            tagMusic("Charts", ColorCustom.moreDeepRed, Icons.album),
-            SizedBox(width: 10,),
-            tagMusic("New\nRelease", ColorCustom.lightGreen, Icons.album)
-          ],
-        ),
-        SizedBox(height: 10,),
-
-        Row(
-          children: <Widget>[
-            tagMusic("Karaoke", ColorCustom.deepOrange, Icons.album),
-            SizedBox(width: 10,),
-            tagMusic("Party", ColorCustom.purple, Icons.album)
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget tagMusic(String str, Color color, IconData icon){
-    return GestureDetector(
-      onTap: () {
-        print("Select $str");
-      },
-      child: Container(
-        padding: EdgeInsets.only(left: 15, right: 15, top: 7, bottom: 5),
-        width: 155,
-        height: 80,
-        decoration: BoxDecoration(
-          color: color,
-          border: Border.all(color: Colors.black),
-          borderRadius: BorderRadius.all(Radius.circular(15))
-        ),
-        child: Row(
-          children: <Widget>[
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget> [
-                TextLato(str, Colors.white, 18, FontWeight.w400),
-              ]
-            ),
-            Expanded(child: Container(),),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget> [
-                Icon(
-                  icon,
-                  size: 45,
-                  color: Colors.white,
-                  )
-              ]
-            )
-
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget emptySearch(){
     return Expanded(
       child: Container(
@@ -268,6 +168,40 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
+  Widget errorScreen(){
+    final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
+    final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
+    return Expanded(
+      child: Container(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                Icons.error,
+                size: 75,
+                color: Colors.grey,
+              ),
+              SizedBox(height: 10),
+              TextLato("Server Error", Colors.grey, 20, FontWeight.w700,),
+              SizedBox(height: 10),
+              RaisedButton(
+                padding: EdgeInsets.zero,
+                color: ColorCustom.orange,
+                child: TextLato("Retry", Colors.black, 20, FontWeight.w700),
+                onPressed: (){
+                  mpBloC.onlineSongs.add(null);
+                  mpBloC.fetchAllSongDB();
+                }
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget searchList(){
     final GlobalBloC globalBloC = Provider.of<GlobalBloC>(context);
     final MusicPlayerBloC mpBloC = globalBloC.mpBloC;
@@ -279,17 +213,20 @@ class _SearchPageState extends State<SearchPage> {
             return initScreen();
           }
           else if (snapshot.data == []){
-            return initScreen();
+            return errorScreen();
+          } 
+          else if (snapshot.data[0] == null && _searchKey == ""){
+            return errorScreen();
           }
-          else if (_searchKey == ""){
-            return initScreen();
-          }
-          List<Song> songsDB = snapshot.data;
 
-          List<Song> _filterList = songsDB.where((element) => 
-            (element.title.toLowerCase().contains(_searchKey.toLowerCase()) || 
-            element.artist.toLowerCase().contains(_searchKey.toLowerCase())))
-            .toList();
+          List<Song> songsDB = snapshot.data;
+          List<Song> _filterList;
+          if (_searchKey == "") _filterList = songsDB;
+          else
+            _filterList = songsDB.where((element) => 
+              (element.title.toLowerCase().contains(_searchKey.toLowerCase()) || 
+              element.artist.toLowerCase().contains(_searchKey.toLowerCase())))
+              .toList();
           
           if (_filterList.length == 0){
             return emptySearch();
