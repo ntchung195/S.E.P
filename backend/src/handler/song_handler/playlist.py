@@ -17,6 +17,7 @@ def play(result,db):
     song = db.songInfo
     id = result['_id']
     songRes = song.find_one({"_id" :ObjectId(id)},{'songName':1,'artist':1,'_id':0,'link':1,'duration':1})
+    songRes["title"] = songRes['songName']
     return jsonify(
         songRes
     ),200

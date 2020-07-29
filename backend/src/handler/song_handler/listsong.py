@@ -40,7 +40,7 @@ def addSong(result, db):
     res =songs.find_one({'_id':ObjectId(id)})
     if not res:
         return "Wrong Id"
-    if play.find_one({'songs._id':ObjectId(id)}):
+    if play.find_one({'song._id':ObjectId(id), 'list_name':result['playlistName'], 'username':result['username']}):
         return "Duplicated"
     play.update({'username':result['username'],'list_name':result['playlistName']},{'$push':{'song':{'_id':res['_id'], 'songName':res['songName'] }}})
 
