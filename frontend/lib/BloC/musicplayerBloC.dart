@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:MusicApp/Data/songModel.dart';
 import 'package:MusicApp/OnlineFeature/httpService.dart';
 import 'package:flute_music_player/flute_music_player.dart';
 import 'package:rxdart/rxdart.dart';
@@ -38,7 +37,6 @@ class MusicPlayerBloC{
 
   BehaviorSubject<Song> _currentSong;
   BehaviorSubject<MapEntry<List<Song>, List<Song>>> _currPlaylist;
-  BehaviorSubject<MapEntry<List<SongItem>, List<SongItem>>> _currPlaylistOnline;
   
   BehaviorSubject<List<Song>> get songList => _offlineSongs;
   BehaviorSubject<MapEntry<List<Song>, List<Song>>> get currentPlaying => _currPlaylist;
@@ -60,6 +58,8 @@ class MusicPlayerBloC{
     _initStreams();
     _initAudioPlayer();
     _initCurrentSong();
+    fetchSongs();
+    fetchRecently();
   }
 
   void dispose(){
@@ -68,7 +68,6 @@ class MusicPlayerBloC{
     fromDB.close();
   //Common stream
     _currPlaylist.close();
-    _currPlaylistOnline.close();
     _audioPlayer.stop();
     _position.close();
     _offlineSongs.close();
@@ -88,7 +87,6 @@ class MusicPlayerBloC{
     fromDB = BehaviorSubject<bool>.seeded(false);
     
     _currPlaylist = BehaviorSubject<MapEntry<List<Song>, List<Song>>>();
-    _currPlaylistOnline = BehaviorSubject<MapEntry<List<SongItem>, List<SongItem>>>();
     _offlineSongs = BehaviorSubject<List<Song>>();
     recently = BehaviorSubject<List<Song>>.seeded([]);
 
@@ -119,7 +117,6 @@ class MusicPlayerBloC{
 
   void _initAudioPlayer() {
     _audioPlayer = MusicFinder();
-
     _audioPlayer.setPositionHandler(
       (Duration position) {
         updatePosition(position);
@@ -139,23 +136,29 @@ class MusicPlayerBloC{
     );
 
     _audioPlayer.setErrorHandler((msg) {
-      _playerState.add(PlayerState.stopped);
+      //_playerState.add(PlayerState.stopped);
       _duration = new Duration(seconds: 0);
       _position = BehaviorSubject<Duration>.seeded(Duration(seconds: 0));
     });
   }
 
+  Future<void> fetchFromDB() async{
+    await fetchFavourite();
+    await fetchAllSongDB();
+  }
+
   Future<void> fetchFavourite() async {
+    print("Fectch Favourite");
     List<Song> _favourite = await getfavourite();
-    print("Favourite: $_favourite");
-    favourite.add(_favourite);
-    //favourite = _offlineSongs;
+    if (_favourite != null)
+      favourite.add(_favourite);
   }
 
   Future<void> fetchAllSongDB() async {
+    print("Fectch Songs in DB");
     List<Song> songDBlist = await getSongDB();
-    onlineSongs.add(songDBlist);
-    //onlineSongs = _offlineSongs;
+    if (songDBlist != null)
+      onlineSongs.add(songDBlist);
   }
 
   Future<void> fetchSongs() async {
@@ -210,26 +213,30 @@ class MusicPlayerBloC{
 
   void updateRecent(Song song) async {
 
-    if (fromDB.value == true)
+    if (fromDB.value) {
       for (int i = 0; i < recently.value.length; i++)
         if (song.iD == recently.value[i].iD) return;
-    else 
-      if (recently.value.indexOf(song) != -1) return;
+    }
+    else {
+      for (var x in recently.value){
+        if (song.title == x.title && song.artist == x.artist) return;
+      }
+        
+    }
 
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     List<String> _encodedStrings = _prefs.getStringList("Recently") ?? [];
     
     if (recently.value.length >= 10){
-      recently.value.removeAt(0);
-      _encodedStrings.removeAt(0);
+      recently.value.removeAt(recently.value.length-1);
+      _encodedStrings.removeAt(recently.value.length-1);
     }
 
-    recently.value.add(song);
+    recently.value.insert(0, song);
     recently.add(recently.value);
-    _encodedStrings.add(_encodeSongToJson(song));
-
+    _encodedStrings.insert(0,_encodeSongToJson(song));
     _prefs.setStringList("Recently", _encodedStrings);
-    
+
   }
 
   String _encodeSongToJson(Song song) {
@@ -281,6 +288,7 @@ class MusicPlayerBloC{
     
     if (song.uri == null) {
       Song songDB = await getSong(song.iD);
+      songDB.iD = song.iD;
       if (songDB == null) {
         print("Cant load song");
         return;
@@ -293,10 +301,11 @@ class MusicPlayerBloC{
     play();
   }
 
-
   void play() async{
     _playerState.add(PlayerState.playing);
-    _audioPlayer.play(_currentSong.value.uri, isLocal: false);
+    // _audioPlayer.setStartHandler(() { })
+    final result = await _audioPlayer.play(_currentSong.value.uri, isLocal: false);
+    if (result == 1) _playerState.add(PlayerState.playing);
   }
 
   void pause() async {
@@ -318,9 +327,9 @@ class MusicPlayerBloC{
     final List<Song> _playlist = isShuffle ? _currPlaylist.value.value : _currPlaylist.value.key;
     
     int index = 0;
-    if (fromDB.value == true) {
+    if (_currentSong.value.iD != null) {
       while (index < _playlist.length){
-        if (_currentSong.value.title == _playlist[index].title && _currentSong.value.artist == _playlist[index].artist){
+        if (_currentSong.value.iD == _playlist[index].iD){
           break;
         }
         index++;
@@ -328,7 +337,6 @@ class MusicPlayerBloC{
     }
     else
       index = _playlist.indexOf(_currentSong.value);
-    //print("Index: $index");
 
     if (index == -1) index = 0; //Song not in current playlist
     

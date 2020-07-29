@@ -19,17 +19,9 @@
 - Login  
 - Sign Up  
 - Display User Profile
-
-## TODO
 - Play song from database (current working)
 - Send recorder for voice authentication
 - Change User Profile
 
-
-## New Update
-
-- Display User Profile
-- Fetch Favorite List and Song from DB
-
-## Screenshot
-<img src="https://github.com/sangn2911/MusicApp/blob/musicappFunction/flutter_01.png" width="250"> <img src="https://github.com/sangn2911/MusicApp/blob/musicappFunction/flutter_02.png" width="250"> <img src="https://github.com/sangn2911/MusicApp/blob/musicappFunction/flutter_03.png" width="250"> <img src="https://github.com/sangn2911/MusicApp/blob/musicappFunction/flutter_04.png" width="250"> <img src="https://github.com/sangn2911/MusicApp/blob/musicappFunction/flutter_05.png" width="250"> <img src="https://github.com/sangn2911/MusicApp/blob/musicappFunction/flutter_07.png" width="250"> 
+### Note
+- Replace file flute_music_player.dart with the default file flute_music_player.dart in the library

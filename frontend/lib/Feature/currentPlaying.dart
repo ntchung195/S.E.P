@@ -2,7 +2,6 @@ import 'package:MusicApp/BloC/globalBloC.dart';
 import 'package:MusicApp/Custom/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flute_music_player/flute_music_player.dart';
-// import 'package:provider/provider.dart';
 import 'package:MusicApp/BloC/musicplayerBloC.dart';
 import 'package:MusicApp/Custom/customText.dart';
 import 'package:rxdart/rxdart.dart';
@@ -11,7 +10,6 @@ class CurrentPlayBar extends StatefulWidget {
   
   final GlobalBloC _gBloC;
   CurrentPlayBar(this._gBloC);
-
 
   @override
   CurrentPlayBarState createState() => CurrentPlayBarState();
@@ -93,7 +91,7 @@ class CurrentPlayBarState extends State<CurrentPlayBar> {
     );
   }
 
-  Widget playIconButton(Song currentSong, MusicPlayerBloC mp,PlayerState playerState){
+  Widget playIconButton(Song currentSong, MusicPlayerBloC mpBloC,PlayerState playerState){
     return IconButton(
       padding: EdgeInsets.all(0),
       iconSize: 60,
@@ -103,22 +101,10 @@ class CurrentPlayBarState extends State<CurrentPlayBar> {
         size: 60,
       ), 
       onPressed: (){
-        playerState != PlayerState.paused ? mp.pause() : mp.play();
+        if (playerState == PlayerState.playing) mpBloC.pause();
+        else if (playerState == PlayerState.paused) mpBloC.play();
+        else return;
       }
-    );
-  }
-
-
-  Widget text(String str, Color color , double size, FontWeight fontweight){
-    return Text(
-      str,
-      overflow: TextOverflow.ellipsis,
-      style: TextStyle(
-        color: color,
-        fontSize: size,
-        fontFamily: 'Lato',
-        fontWeight: fontweight,
-      ),
     );
   }
 

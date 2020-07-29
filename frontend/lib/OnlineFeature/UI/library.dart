@@ -1,5 +1,5 @@
 import 'package:MusicApp/BloC/globalBloC.dart';
-import 'package:MusicApp/BloC/musicplayerBloC.dart';
+// import 'package:MusicApp/BloC/musicplayerBloC.dart';
 import 'package:MusicApp/BloC/userBloC.dart';
 import 'package:MusicApp/Data/userModel.dart';
 import 'package:MusicApp/OnlineFeature/UI/playlist.dart';
@@ -116,12 +116,13 @@ class _LibraryState extends State<Library> {
                 UserModel user = globalBloC.userBloC.userInfo.value;
                 List<String> playlists = await createPlaylist(customController.text, user.name);
                 if ( playlists[0] == "" ) {
-                  createAlertDialog("Playlist's name exist", context);
+                  createAlertDialog("Playlist Exists", context);
                 }
                 else if ( playlists == null) createAlertDialog("Server Error", context);
                 else{
                   globalBloC.userBloC.playlists.add(playlists);
                   Navigator.pop(context);
+                  createAlertDialog("Playlist ${customController.text} created", context);
                 }
                   
               },

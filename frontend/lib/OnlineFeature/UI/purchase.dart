@@ -12,7 +12,7 @@ class Purchase extends StatelessWidget {
   final String type;
   final BuildContext parentContext;
 
-  Purchase({@required this.userBloC, this.type, this.parentContext});
+  Purchase({@required this.userBloC, this.type,@required this.parentContext});
 
 
   @override
@@ -75,7 +75,9 @@ class Purchase extends StatelessWidget {
         leading: image,
         title: text(bankName, color: Colors.amber),
         onTap: (){
-          createAlert(context, bankName); // send to database
+          Navigator.pop(context);
+          if (type == "status") createBankDialog(context, bankName); // send to database
+          else if (type == "buycoin") popUpCoin(context);
         },
       ),
     );
@@ -84,7 +86,7 @@ class Purchase extends StatelessWidget {
   final TextEditingController customController = TextEditingController();
   final TextEditingController coinController = TextEditingController();
 
-  Future<String> createAlert(BuildContext context, String bankName){
+  Future<String> createBankDialog(BuildContext context, String bankName){
     return showDialog(
       context: context, 
       builder: (context){
@@ -100,10 +102,16 @@ class Purchase extends StatelessWidget {
               fontWeight: FontWeight.w400,
               color: Colors.amber,
             ),
-            cursorColor: Colors.black,
+            cursorColor: Colors.amber,
             decoration: InputDecoration(
-              focusedBorder: UnderlineInputBorder(
+              enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.black)
+              ),
+              border: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white)
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white)
               )
             ),
           ),
@@ -119,25 +127,18 @@ class Purchase extends StatelessWidget {
               elevation: 5.0,
                 child: text('Confirm buy',size: 20 ,color: Colors.amber),
               onPressed: () async{
-                if (type == "status"){
-                  // if (customController.text.toString().contains(RegExp(r'[A-Z]')))
-                  // int _coin = int.parse(customController.text.toString());
-                  // print(int.parse(customController.text.toString()));
-
-                  int result = await buyVipAndSong(userBloC,customController.text.toString() ,type, 100000);
-                  if (result == 0){
-                    customController.text = "";
-                    int count = 0;
-                    Navigator.of(context).popUntil((_) => count++ >= 2);
-                  }
-                  else if (result == 1) createAlertDialog("Not enough coin!", context);
-                  else if (result == 2) createAlertDialog("Wrong password", context);
-                  else createAlertDialog("There is problems", context);
-
+                
+                int result = await buyVipAndSong(userBloC,customController.text.toString() ,type, 100000);
+                if (result == 0){
+                  customController.text = "";
+                  Navigator.pop(context);
+                  createAlertDialog("You are VIP", context);
                 }
-                else if (type == "buycoin"){
-                  popUpCoin(context);
-                }
+                else if (result == 1) createAlertDialog("Not enough coin!", context);
+                else if (result == 2) createAlertDialog("Wrong password", context);
+                else createAlertDialog("There is problems", context);
+
+
 
               },
             )
@@ -164,8 +165,14 @@ class Purchase extends StatelessWidget {
             ),
             cursorColor: Colors.black,
             decoration: InputDecoration(
-              focusedBorder: UnderlineInputBorder(
+              enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.black)
+              ),
+              border: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white)
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white)
               )
             ),
           ),
@@ -188,12 +195,11 @@ class Purchase extends StatelessWidget {
                   int coin = int.parse(coinController.text);
                   int result = await transactionForCoin(userBloC, coin);
 
-                  if (result == 0){
-                    int count = 0;
-                    createAlertDialog("Successful Transaction", parentContext);
-                    Navigator.of(context).popUntil((_) => count++ >= 3);
-                  } 
-                  else createAlertDialog("Fail Transaction", context);
+                  if (result == 0) {
+                    Navigator.pop(context);
+                    createAlertDialog("Successful Transaction", context);
+                  }
+                  else createAlertDialog("Fail Transaction \n(Coin > 20000)", context);
                 }
               },
             )

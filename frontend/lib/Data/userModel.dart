@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-UserModel userModelFromJson(String str) => UserModel.fromJson(json.decode(str));
+UserModel userModelFromJson(Map<String,dynamic> json) => UserModel.fromJson(json);
 
 String userModelToJson(UserModel data) => json.encode(data.toJson());
 
@@ -27,7 +27,7 @@ class UserModel {
         name: json["username"],
         email: json["email"],
         phone: json["phone"] == null ? "Add phone" : json["phone"],
-        coin: json["coin"] == null ? "Add coin" : json["coin"],
+        coin: json["coin"] == null ? 0 : json["coin"],
         isVip: json["status"],
     );
 

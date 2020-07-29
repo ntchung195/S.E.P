@@ -32,7 +32,6 @@ class UserBloC {
     currentPlaylist = BehaviorSubject<List<Song>>.seeded([]);
   }
 
-
   void dispose(){
     //currentId.close();
     playlists.close();
@@ -47,9 +46,5 @@ class UserBloC {
 
   void saveUserInfo(UserModel userInfo){
     _userInfo.add(userInfo);
-  }
-
-  void changeUserName(String name){
-    _userInfo.value.name = name;
   }
 }
